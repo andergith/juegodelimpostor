@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego del Impostor - Votación</title>
+    <title>Juego del Impostor - Final Fixed</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
-            --glass-bg: rgba(22, 33, 62, 0.95); 
+            /* MODO OSCURO */
+            --glass-bg: rgba(22, 33, 62, 0.85); 
             --glass-border: rgba(255, 255, 255, 0.15);
             --accent-color: #e94560;
             --text-main: #ffffff;
@@ -18,15 +19,15 @@
             --btn-color: #0f3460;
             --danger-color: #ff4757;
             --success-color: #2ecc71;
-            --whatsapp-color: #25D366;
             --input-bg: rgba(0, 0, 0, 0.5); 
             --option-bg: #000000;
             --option-text: #ffffff;
             --bg-gradient: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab, #1a1a2e);
         }
 
+        /* MODO CLARO */
         body.light-mode {
-            --glass-bg: rgba(255, 255, 255, 0.95); 
+            --glass-bg: rgba(255, 255, 255, 0.85); 
             --glass-border: rgba(0, 0, 0, 0.1);
             --accent-color: #ff6b6b;
             --text-main: #2d3436;
@@ -56,37 +57,31 @@
             transition: color 0.3s ease;
         }
 
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
         .container {
             background-color: var(--glass-bg);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            width: 90%;
             max-width: 420px;
-            max-height: 90vh;
-            margin: 0 auto;
+            width: 90%;
+            height: 60%;
+            margin: 20px auto;
             position: relative;
             box-sizing: border-box;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden;
             transition: background-color 0.3s ease;
         }
 
-        /* UTILS */
-        #connection-status {
-            position: fixed; top: 0; left: 0; width: 100%; 
-            background: var(--danger-color); color: white; 
-            font-size: 0.8rem; padding: 5px; z-index: 9999; 
-            display: none; font-weight: bold; text-align: center;
-        }
-        
-        /* Toggle Theme */
+        /* TOGGLE THEME */
         .theme-switch-wrapper { position: absolute; top: 25px; left: 20px; display: flex; align-items: center; z-index: 10; }
         .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
         .theme-switch input { display: none; }
@@ -96,86 +91,49 @@
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        h1 { margin-bottom: 1rem; color: var(--accent-color); text-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-top: 10px; }
-        .screen { display: none; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; }
+        h1 { margin-bottom: 1.5rem; color: var(--accent-color); text-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-top: 10px; }
+        .screen { display: none; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="text"], select {
-            padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border); 
-            width: 100%; box-sizing: border-box; font-size: 16px; background: var(--input-bg); 
-            color: var(--text-main); outline: none; transition: all 0.2s; appearance: none; -webkit-appearance: none;
-        }
+        input[type="text"], select { padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border); width: 100%; box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-main); outline: none; transition: all 0.2s; appearance: none; -webkit-appearance: none; }
         input[type="text"]:focus, select:focus { background: rgba(125, 125, 125, 0.1); border-color: var(--accent-color); }
         select:disabled { opacity: 0.6; }
         select option { background-color: var(--option-bg); color: var(--option-text); }
         select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27292.4%27%20height%3D%27292.4%27%3E%3Cpath%20fill%3D%27%23888888%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4-3.7%203.7-5.4%208-5.4%2013%200%205%201.8%209.3%205.4%2013l128%20128c3.7%203.7%208%205.4%2013%205.4s9.3-1.8%2013-5.4l128-128c3.7-3.7%205.4-8%205.4-13%200-5-1.8-9.3-5.4-13z%27%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 1em top 50%; background-size: .65em auto; padding-right: 2.5em; }
         label { display: block; text-align: left; margin-top: 15px; margin-bottom: 5px; font-weight: 700; color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        button {
-            background-color: var(--accent-color); color: white; border: none; padding: 16px 30px; 
-            border-radius: 16px; font-size: 1.1rem; cursor: pointer; width: 100%; font-weight: 700;
-            transition: transform 0.1s, opacity 0.2s; margin-top: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            -webkit-tap-highlight-color: transparent;
-        }
+        button { background-color: var(--accent-color); color: white; border: none; padding: 16px 30px; border-radius: 16px; font-size: 1.1rem; cursor: pointer; width: 100%; font-weight: 700; transition: transform 0.1s; margin-top: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); -webkit-tap-highlight-color: transparent; }
         button:active { transform: scale(0.96); }
-        button:disabled { opacity: 0.7; cursor: wait; }
-        
         button.small-btn { width: auto; padding: 0 20px; margin: 0; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; }
         button.secondary { background-color: var(--btn-color); box-shadow: none; }
         button.danger { background-color: var(--danger-color); margin-top: 25px; }
         button.exit-btn { width: auto; padding: 5px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); margin: 0; box-shadow: none; }
-        button.whatsapp-btn { background-color: var(--whatsapp-color); font-size: 0.9rem; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        
-        /* Botones de Votación */
-        .vote-btn {
-            background-color: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            text-align: left;
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .vote-btn.selected {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-        }
+        .btn-start-margin { margin-top: 40px !important; }
 
-        .mode-btn { padding: 25px; font-size: 1.3rem; margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .mode-subtext { font-size: 0.8rem; font-weight: normal; opacity: 0.8; }
+        #player-list-lobby { list-style: none; padding: 0; margin: 20px 0; max-height: 150px; overflow-y: auto; scrollbar-width: thin; }
+        .lobby-player { background: var(--input-bg); padding: 10px; margin: 5px 0; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; border: 1px solid var(--glass-border); }
+        .me-badge { font-size: 0.8rem; background: var(--success-color); padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; }
+        .host-badge { font-size: 0.8rem; background: #f1c40f; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-right: 5px; }
 
-        #player-list-lobby, #offline-player-list { list-style: none; padding: 0; margin: 10px 0; max-height: 20vh; overflow-y: auto; scrollbar-width: thin; }
-        .lobby-player, .player-item { background: var(--input-bg); padding: 10px; margin: 5px 0; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
-        .delete-btn { background: #ff7675; border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; box-shadow: none; }
-
-        .me-badge { font-size: 0.7rem; background: var(--success-color); padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-left: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .host-badge { font-size: 0.7rem; background: #f1c40f; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-right: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .score-badge { font-size: 0.9rem; font-weight: bold; color: var(--accent-color); background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; }
-
-        .role-card { background: var(--input-bg); color: var(--text-main); padding: 30px 20px; border-radius: 20px; margin: 20px 0; font-size: 2rem; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .role-card { background: var(--input-bg); color: var(--text-main); padding: 30px 20px; border-radius: 20px; margin: 25px 0; font-size: 2rem; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .imposter-reveal { background: rgba(255, 71, 87, 0.2); border: 1px solid var(--danger-color); color: var(--danger-color); }
-        .hint-box { display: block; margin-top: 15px; font-size: 1rem; font-weight: 500; background: rgba(0,0,0,0.1); color: var(--text-main); padding: 15px; border-radius: 12px; width: 100%; box-sizing: border-box; }
+        .hint-box { display: block; margin-top: 15px; font-size: 1.1rem; font-weight: 500; background: rgba(0,0,0,0.1); color: var(--text-main); padding: 15px; border-radius: 12px; width: 100%; box-sizing: border-box; }
         
-        #timer { font-size: 4rem; margin: 10px 0; font-weight: 800; color: var(--accent-color); font-family: 'Courier New', monospace; text-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .room-code-display { font-size: 2.5rem; font-weight: bold; letter-spacing: 5px; color: var(--success-color); margin: 5px 0; background: var(--input-bg); padding: 5px; border-radius: 10px; }
+        #timer { font-size: 4.5rem; margin: 10px 0; font-weight: 800; color: var(--accent-color); font-family: 'Courier New', monospace; text-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .room-code-display { font-size: 3rem; font-weight: bold; letter-spacing: 5px; color: var(--success-color); margin: 10px 0; background: var(--input-bg); padding: 10px; border-radius: 10px; }
 
         #review-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--glass-bg); z-index: 2000; padding: 20px; box-sizing: border-box; display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 24px; backdrop-filter: blur(20px); overflow-y: auto; }
         .close-icon-overlay { position: absolute; top: 20px; right: 25px; font-size: 2.5rem; color: var(--text-main); cursor: pointer; z-index: 2001; font-weight: bold; line-height: 1; }
         
-        .lobby-settings-box { border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 10px; text-align: left; }
+        .lobby-settings-box { border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 15px; text-align: left; }
         .host-badge-settings { font-size: 0.7rem; color: var(--success-color); float: right; font-weight: normal; margin-top: 3px; }
-        .header-game { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 5px; min-height: 30px;}
-        .lobby-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 5px; }
-        .score-btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .score-btn-civ { background-color: var(--btn-color); font-size: 0.9rem; }
-        .score-btn-imp { background-color: var(--danger-color); font-size: 0.9rem; margin-top: 0;}
+        .header-game { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; min-height: 30px;}
+        .lobby-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-
-<div id="connection-status">⚠️ Sin conexión a internet</div>
 
 <div class="container">
     <div class="theme-switch-wrapper">
@@ -188,72 +146,15 @@
         </label>
     </div>
 
-    <div id="mode-selection-screen" class="screen active">
-        <h1>🕵️ El Impostor</h1>
-        <p style="opacity: 0.8; margin-bottom: 20px;">Elige cómo quieres jugar:</p>
-        <button class="mode-btn" onclick="selectMode('offline')">
-            🏠 Jugar en Persona
-            <span class="mode-subtext">1 solo móvil (Pasar y jugar)</span>
-        </button>
-        <button class="mode-btn secondary" onclick="selectMode('online')">
-            🌐 Jugar Online
-            <span class="mode-subtext">Cada uno en su casa</span>
-        </button>
-    </div>
-
-    <div id="online-home-screen" class="screen">
-        <div class="header-game"><button onclick="goBackToMode()" class="exit-btn">← Volver</button></div>
-        <h1>Modo Online</h1>
+    <div id="home-screen" class="screen active">
+        <h1>🕵️ El Impostor<br><span style="font-size:1rem; opacity:0.7">Modo Online</span></h1>
         <input type="text" id="player-name-input" placeholder="Tu Nombre" maxlength="12">
-        <div style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
-            <button onclick="createRoom()" id="btn-create">👑 Crear Nueva Sala</button>
+        <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <button onclick="createRoom()">👑 Crear Nueva Sala</button>
             <p style="margin: 15px 0; opacity: 0.7;">- O -</p>
             <input type="text" id="room-code-input" placeholder="Código de Sala" style="text-transform: uppercase;">
-            <button class="secondary" onclick="joinRoom()" id="btn-join">Entrar en Sala</button>
+            <button class="secondary" onclick="joinRoom()">Entrar en Sala</button>
         </div>
-    </div>
-
-    <div id="offline-setup-screen" class="screen">
-        <div class="header-game"><button onclick="goBackToMode()" class="exit-btn">← Volver</button></div>
-        <h1>Modo Offline</h1>
-        <label style="margin-top:0;">Añadir Jugadores (min 3):</label>
-        <div class="input-group">
-            <input type="text" id="offline-new-player" placeholder="Ej: Ana" onkeypress="handleEnterOffline(event)" autocomplete="off">
-            <button class="small-btn" onclick="addOfflinePlayer()">+</button>
-        </div>
-        <ul id="offline-player-list"></ul>
-        <div class="lobby-settings-box">
-            <label>CONFIGURACIÓN</label>
-            <select id="offline-imposter-count">
-                <option value="random" selected>🎲 Aleatorio (1 o 2)</option>
-                <option value="1">1 Impostor</option>
-                <option value="2">2 Impostores</option>
-            </select>
-            <select id="offline-category-select">
-                <option value="random">🎲 Categoría Aleatoria</option>
-                <option value="lugares">🌍 Lugares</option>
-                <option value="comida">🍕 Comida</option>
-                <option value="animales">🐶 Animales</option>
-                <option value="profesiones">💼 Profesiones</option>
-                <option value="deportes">⚽ Deportes</option>
-                <option value="instrumentos">🎸 Instrumentos</option>
-                <option value="ropa">👕 Ropa</option>
-            </select>
-            <select id="offline-difficulty-select">
-                <option value="medium">🟡 Pista Media</option>
-                <option value="hard">🔴 Pista Difícil</option>
-                <option value="very_hard">💀 Pista Muy Difícil</option>
-            </select>
-            <button onclick="startOfflineGame()" class="btn-start-margin">Empezar Partida</button>
-        </div>
-    </div>
-
-    <div id="offline-pass-screen" class="screen">
-        <h2>Turno de:</h2>
-        <span id="offline-current-player-display" style="font-size: 2rem; font-weight: bold; color: var(--accent-color); display: block; margin: 10px 0;">Jugador</span>
-        <p style="opacity: 0.8; margin-bottom: 20px;">Pasa el dispositivo a <span id="offline-current-player-text"></span>.<br>Nadie más debe mirar.</p>
-        <div style="font-size: 5rem; margin: 30px 0; opacity: 0.8; animation: pulse 2s infinite;">📱🖐️</div>
-        <button onclick="showOfflineRole()">Ver mi Rol</button>
     </div>
 
     <div id="lobby-screen" class="screen">
@@ -262,13 +163,11 @@
         </div>
         <h2 style="font-size: 0.9rem; opacity: 0.7; margin-bottom:5px;">CÓDIGO DE SALA:</h2>
         <div id="display-room-code" class="room-code-display">----</div>
-        <button onclick="shareWhatsApp()" class="whatsapp-btn">📱 Compartir por WhatsApp</button>
-        <p style="margin-bottom: 5px; opacity: 0.7; font-size: 0.9rem; margin-top: 20px;">Jugadores:</p>
+        <p style="margin-bottom: 5px; opacity: 0.7; font-size: 0.9rem;">Jugadores:</p>
         <ul id="player-list-lobby"></ul>
         <div class="lobby-settings-box">
             <label>CONFIGURACIÓN <span id="settings-status-text" class="host-badge-settings"></span></label>
             <select id="imposter-count" onchange="syncSettings()">
-                <option value="random" selected>🎲 Aleatorio (1 o 2)</option>
                 <option value="1">1 Impostor</option>
                 <option value="2">2 Impostores</option>
             </select>
@@ -303,7 +202,9 @@
     </div>
 
     <div id="game-screen" class="screen" style="position: relative;">
-        <div class="header-game"><button onclick="exitGame()" class="exit-btn">✕ Salir</button></div>
+        <div class="header-game">
+            <button onclick="exitGame()" class="exit-btn">✕ Salir</button>
+        </div>
         <div id="review-overlay">
             <div class="close-icon-overlay" onclick="closeRoleReview()">✕</div>
             <h2 style="margin-bottom: 20px;">Tu Rol Secreto</h2>
@@ -318,36 +219,21 @@
             <p style="margin:0; font-size:0.8rem; opacity:0.7;">EMPIEZA HABLANDO:</p>
             <h2 id="starter-name" style="margin:5px 0;">?</h2>
         </div>
-        <div id="timer">03:00</div>
+        <div id="waiting-others-msg" style="display:none; margin: 20px 0; color: var(--text-secondary); font-style: italic;">
+            Esperando a que todos vean su rol...
+        </div>
+        <div id="timer" style="display:block;">03:00</div>
         <button id="btn-review-role" onclick="openRoleReview()" class="secondary" style="font-size: 0.9rem; padding: 10px; margin-bottom: 20px;">👁️ Recordar mi palabra</button>
         <div id="host-game-controls" style="display:none;">
-            <button class="danger" onclick="startVotingGlobal()">🚨 RESOLVER / VOTAR</button>
-        </div>
-        <div id="offline-game-controls" style="display:none;">
-            <button class="danger" onclick="endGameGlobal()">🚨 RESOLVER</button>
-        </div>
-    </div>
-
-    <div id="voting-screen" class="screen">
-        <h2>🗳️ Votación</h2>
-        <p style="opacity: 0.8; margin-bottom:15px;">Elige a quién acusar:</p>
-        <div id="voting-buttons-container"></div>
-        <p id="vote-status" style="margin-top:20px; font-style:italic; opacity:0.7;"></p>
-        
-        <div id="host-voting-controls" style="display:none; margin-top:20px;">
-            <button onclick="endGameGlobal()" class="small-btn" style="font-size:1rem; width:100%;">Forzar Resultados</button>
+            <button class="danger" onclick="endGameGlobal()">🚨 RESOLVER / VOTAR</button>
         </div>
     </div>
 
     <div id="result-screen" class="screen">
-        <div class="header-game"><button onclick="exitGame()" class="exit-btn">✕ Salir</button></div>
-        <h1>FIN DE PARTIDA</h1>
-        
-        <div id="voting-results-display" style="display:none; margin-bottom:20px; background: rgba(0,0,0,0.2); padding:10px; border-radius:10px;">
-            <h3 style="font-size:1rem; margin-top:0;">Resultados Votación:</h3>
-            <ul id="votes-list" style="list-style:none; padding:0; text-align:left; font-size:0.9rem;"></ul>
+        <div class="header-game">
+            <button onclick="exitGame()" class="exit-btn">✕ Salir</button>
         </div>
-
+        <h1>FIN DE PARTIDA</h1>
         <div style="background: var(--input-bg); padding: 20px; border-radius: 15px; border: 2px solid var(--accent-color);">
             <p style="margin:0; opacity: 0.7; font-size: 0.9rem;">IMPOSTOR(ES):</p>
             <div id="result-impostors" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-color); margin: 10px 0;">-</div>
@@ -355,30 +241,14 @@
             <p style="margin:0; opacity: 0.7; font-size: 0.9rem;">PALABRA SECRETA:</p>
             <div id="result-word" style="font-size: 1.5rem; font-weight: bold; color: var(--success-color); margin-top: 5px;">-</div>
         </div>
-        
-        <div id="host-score-controls" style="display:none; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
-            <p style="font-size: 0.9rem; margin-bottom: 10px;">¿QUIÉN GANÓ?</p>
-            <div class="score-btn-group">
-                <button class="score-btn-civ" onclick="distributePoints('civilians')">😇 Ciudadanos (+1)</button>
-                <button class="score-btn-imp" onclick="distributePoints('impostors')">😈 Impostor (+3)</button>
-            </div>
-            <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">(Esto reiniciará la partida)</p>
-        </div>
-
         <div id="host-restart-controls" style="display:none;">
-            <button onclick="returnToLobbyGlobal()" style="background:transparent; border:1px solid var(--glass-border); font-size:0.8rem; margin-top:10px;">Reiniciar sin puntuar</button>
+            <button onclick="returnToLobbyGlobal()">🔄 JUGAR OTRA VEZ</button>
         </div>
-        
-        <div id="client-wait-restart" style="display:none; margin-top:20px;">
-            <p id="waiting-restart" style="animation: pulse 1.5s infinite;">Esperando al anfitrión...</p>
-        </div>
-        
-        <button id="offline-restart-btn" onclick="resetOfflineGame()" style="display:none; margin-top:20px;">🔄 VOLVER AL MENU</button>
+        <p id="waiting-restart" style="display:none; margin-top:20px;">Esperando reinicio...</p>
     </div>
 </div>
 
 <script>
-    // --- FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyCD9EZAZldGoBHv5-v9jQ8wfOSVPL9mu60",
         authDomain: "juego-del-impostor-9318e.firebaseapp.com",
@@ -393,125 +263,281 @@
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.database();
 
-    const connectedRef = db.ref(".info/connected");
-    connectedRef.on("value", (snap) => {
-        const banner = document.getElementById('connection-status');
-        if (snap.val() === true) banner.style.display = 'none'; else banner.style.display = 'block';
-    });
-
-    async function requestWakeLock() { if ('wakeLock' in navigator) { try { await navigator.wakeLock.request('screen'); } catch (err) { console.log(err); } } }
-
-    // --- VARIABLES ---
-    let CURRENT_MODE = ''; 
     let myName = "";
     let myId = localStorage.getItem('impostor_myId') || ""; 
     let roomId = "";
     let isHost = false;
     let playersInRoom = [];
-    let offlinePlayers = [];
-    let currentOfflineIndex = 0;
     let timerInterval;
     let mySavedRoleData = null; 
-    let currentGameState = null;
-    let hasVoted = false; // Control de votación local
 
+    // --- BASE DE DATOS (COMPLETA) ---
     const database = {
-        lugares: [
-            { word: "Playa", hints: { medium: "Arena", hard: "Sal", very_hard: "Marea" } },
-            { word: "Hospital", hints: { medium: "Silencio", hard: "Bata", very_hard: "Guardia" } },
-            { word: "Escuela", hints: { medium: "Pizarra", hard: "Recreo", very_hard: "Septiembre" } },
-            { word: "Cine", hints: { medium: "Palomitas", hard: "Butaca", very_hard: "Estreno" } },
-            { word: "Supermercado", hints: { medium: "Carrito", hard: "Pasillo", very_hard: "Bolsa" } },
-            { word: "Avión", hints: { medium: "Nubes", hard: "Maleta", very_hard: "Pasaporte" } },
-            { word: "Zoológico", hints: { medium: "Jaula", hard: "Safari", very_hard: "Domingo" } }
-        ],
-        comida: [
-            { word: "Pizza", hints: { medium: "Italia", hard: "Caja", very_hard: "Triángulo" } },
-            { word: "Sushi", hints: { medium: "Japón", hard: "Palillos", very_hard: "Crudo" } },
-            { word: "Hamburguesa", hints: { medium: "Pan", hard: "Ketchup", very_hard: "Rápida" } },
-            { word: "Helado", hints: { medium: "Verano", hard: "Derrite", very_hard: "Cuchara" } },
-            { word: "Chocolate", hints: { medium: "Suiza", hard: "Tableta", very_hard: "Amargo" } },
-            { word: "Ensalada", hints: { medium: "Dieta", hard: "Aceite", very_hard: "Mezclar" } }
-        ],
-        animales: [
-            { word: "Perro", hints: { medium: "Amigo", hard: "Hueso", very_hard: "Correa" } },
-            { word: "Gato", hints: { medium: "Bigotes", hard: "Siete vidas", very_hard: "Arena" } },
-            { word: "León", hints: { medium: "Selva", hard: "Melena", very_hard: "Rugido" } },
-            { word: "Elefante", hints: { medium: "Circo", hard: "Maní", very_hard: "Pesado" } },
-            { word: "Tiburón", hints: { medium: "Sangre", hard: "Terror", very_hard: "Surfista" } },
-            { word: "Pingüino", hints: { medium: "Traje", hard: "Huevo", very_hard: "Baile" } }
-        ],
-        deportes: [
-            { word: "Fútbol", hints: { medium: "Gol", hard: "Once", very_hard: "Portería" } },
-            { word: "Baloncesto", hints: { medium: "Alto", hard: "Naranja", very_hard: "NBA" } },
-            { word: "Tenis", hints: { medium: "Red", hard: "Wimbledon", very_hard: "Ventaja" } }
-        ],
-        instrumentos: [
-            { word: "Guitarra", hints: { medium: "Cuerdas", hard: "Púa", very_hard: "Traste" } },
-            { word: "Piano", hints: { medium: "Teclas", hard: "Cola", very_hard: "Pedal" } },
-            { word: "Batería", hints: { medium: "Ritmo", hard: "Platillos", very_hard: "Ruido" } }
-        ],
-        ropa: [
-            { word: "Camiseta", hints: { medium: "Algodón", hard: "Manga", very_hard: "Cuello" } },
-            { word: "Pantalón", hints: { medium: "Piernas", hard: "Cinturón", very_hard: "Bolsillos" } },
-            { word: "Zapatos", hints: { medium: "Suela", hard: "Cordones", very_hard: "Caminar" } }
-        ]
-    };
+            lugares: [
+                { word: "Playa", hints: { easy: "Verano", medium: "Arena", hard: "Sal", very_hard: "Marea" } },
+                { word: "Hospital", hints: { easy: "Médico", medium: "Silencio", hard: "Bata", very_hard: "Guardia" } },
+                { word: "Escuela", hints: { easy: "Alumnos", medium: "Pizarra", hard: "Recreo", very_hard: "Septiembre" } },
+                { word: "Cine", hints: { easy: "Película", medium: "Palomitas", hard: "Butaca", very_hard: "Estreno" } },
+                { word: "Supermercado", hints: { easy: "Compra", medium: "Carrito", hard: "Pasillo", very_hard: "Código de barras" } },
+                { word: "Avión", hints: { easy: "Vuelo", medium: "Nubes", hard: "Azafata", very_hard: "Presión" } },
+                { word: "Zoológico", hints: { easy: "Animales", medium: "Jaula", hard: "Domingo", very_hard: "Cautiverio" } },
+                { word: "Biblioteca", hints: { easy: "Libros", medium: "Silencio", hard: "Préstamo", very_hard: "Estantería" } },
+                { word: "Gimnasio", hints: { easy: "Deporte", medium: "Sudor", hard: "Pesas", very_hard: "Membresía" } },
+                { word: "Restaurante", hints: { easy: "Comida", medium: "Menú", hard: "Propina", very_hard: "Reserva" } },
+                { word: "Parque", hints: { easy: "Jugar", medium: "Banco", hard: "Palomas", very_hard: "Tobogán" } },
+                { word: "Museo", hints: { easy: "Arte", medium: "Antiguo", hard: "Guía", very_hard: "Vitrina" } },
+                { word: "Discoteca", hints: { easy: "Baile", medium: "Noche", hard: "Luces", very_hard: "Sello" } },
+                { word: "Farmacia", hints: { easy: "Medicinas", medium: "Cruz verde", hard: "Receta", very_hard: "Guardia" } },
+                { word: "Aeropuerto", hints: { easy: "Viaje", medium: "Maletas", hard: "Control", very_hard: "Puerta de embarque" } },
+                { word: "Estadio", hints: { easy: "Partido", medium: "Grada", hard: "Afición", very_hard: "Césped" } },
+                { word: "Cárcel", hints: { easy: "Preso", medium: "Rejas", hard: "Naranja", very_hard: "Visita" } },
+                { word: "Cementerio", hints: { easy: "Tumbas", medium: "Flores", hard: "Ciprés", very_hard: "Silencio" } },
+                { word: "Banco", hints: { easy: "Dinero", medium: "Cajero", hard: "Interés", very_hard: "Cola" } },
+                { word: "Hotel", hints: { easy: "Dormir", medium: "Recepción", hard: "Llave", very_hard: "Estrellas" } },
+                { word: "Piscina", hints: { easy: "Nadar", medium: "Cloro", hard: "Gorro", very_hard: "Trampolín" } },
+                { word: "Teatro", hints: { easy: "Actor", medium: "Telón", hard: "Aplausos", very_hard: "Drama" } },
+                { word: "Iglesia", hints: { easy: "Misa", medium: "Domingo", hard: "Campana", very_hard: "Velas" } },
+                { word: "Montaña", hints: { easy: "Altura", medium: "Nieve", hard: "Escalar", very_hard: "Cima" } },
+                { word: "Desierto", hints: { easy: "Arena", medium: "Calor", hard: "Cactus", very_hard: "Espejismo" } },
+                { word: "Selva", hints: { easy: "Verde", medium: "Humedad", hard: "Tarzán", very_hard: "Liana" } },
+                { word: "Isla", hints: { easy: "Mar", medium: "Palmera", hard: "Náufrago", very_hard: "Tesoro" } },
+                { word: "Circo", hints: { easy: "Payaso", medium: "Carpa", hard: "Trapecio", very_hard: "Leones" } },
+                { word: "Casino", hints: { easy: "Juego", medium: "Fichas", hard: "Suerte", very_hard: "Ruleta" } },
+                { word: "Castillo", hints: { easy: "Rey", medium: "Piedra", hard: "Foso", very_hard: "Torre" } }
+            ],
+            comida: [
+                { word: "Pizza", hints: { easy: "Queso", medium: "Italia", hard: "Caja", very_hard: "Triángulo" } },
+                { word: "Sushi", hints: { easy: "Arroz", medium: "Japón", hard: "Palillos", very_hard: "Crudo" } },
+                { word: "Hamburguesa", hints: { easy: "Carne", medium: "Pan", hard: "Ketchup", very_hard: "Rápida" } },
+                { word: "Helado", hints: { easy: "Frío", medium: "Verano", hard: "Cucurucho", very_hard: "Derretido" } },
+                { word: "Chocolate", hints: { easy: "Dulce", medium: "Marrón", hard: "Suiza", very_hard: "Cacao" } },
+                { word: "Ensalada", hints: { easy: "Verde", medium: "Sano", hard: "Aceite", very_hard: "Lechuga" } },
+                { word: "Paella", hints: { easy: "Arroz", medium: "Domingo", hard: "Amarillo", very_hard: "Socarrat" } },
+                { word: "Tacos", hints: { easy: "México", medium: "Tortilla", hard: "Picante", very_hard: "Limón" } },
+                { word: "Espaguetis", hints: { easy: "Pasta", medium: "Largo", hard: "Tomate", very_hard: "Absorber" } },
+                { word: "Huevo frito", hints: { easy: "Desayuno", medium: "Sartén", hard: "Yema", very_hard: "Pan" } },
+                { word: "Sopa", hints: { easy: "Cuchara", medium: "Caliente", hard: "Invierno", very_hard: "Fideos" } },
+                { word: "Pan", hints: { easy: "Harina", medium: "Horno", hard: "Barra", very_hard: "Miga" } },
+                { word: "Queso", hints: { easy: "Ratón", medium: "Leche", hard: "Agujeros", very_hard: "Olor" } },
+                { word: "Manzana", hints: { easy: "Fruta", medium: "Roja", hard: "Blancanieves", very_hard: "Doctor" } },
+                { word: "Plátano", hints: { easy: "Amarillo", medium: "Mono", hard: "Curva", very_hard: "Potasio" } },
+                { word: "Café", hints: { easy: "Mañana", medium: "Negro", hard: "Despertar", very_hard: "Cafeína" } },
+                { word: "Cerveza", hints: { easy: "Alcohol", medium: "Espuma", hard: "Rubia", very_hard: "Cebada" } },
+                { word: "Vino", hints: { easy: "Uva", medium: "Copa", hard: "Tinto", very_hard: "Bodega" } },
+                { word: "Palomitas", hints: { easy: "Cine", medium: "Maíz", hard: "Sal", very_hard: "Explosión" } },
+                { word: "Sandwich", hints: { easy: "Pan molde", medium: "Triángulo", hard: "Mixto", very_hard: "Inglés" } },
+                { word: "Tortilla", hints: { easy: "Huevo", medium: "Patata", hard: "Vuelta", very_hard: "Cebolla" } },
+                { word: "Croquetas", hints: { easy: "Bechamel", medium: "Abuela", hard: "Fritura", very_hard: "Restos" } },
+                { word: "Jamón", hints: { easy: "Cerdo", medium: "España", hard: "Pata", very_hard: "Serrano" } },
+                { word: "Galleta", hints: { easy: "Dulce", medium: "Leche", hard: "Horno", very_hard: "Crujiente" } },
+                { word: "Pastel", hints: { easy: "Cumpleaños", medium: "Velas", hard: "Dulce", very_hard: "Porción" } },
+                { word: "Yogur", hints: { easy: "Cremoso", medium: "Cuchara", hard: "Leche", very_hard: "Tapa" } },
+                { word: "Kebab", hints: { easy: "Rollo", medium: "Carne", hard: "Salsa", very_hard: "Madrugada" } },
+                { word: "Chicle", hints: { easy: "Masticar", medium: "Globo", hard: "Pegajoso", very_hard: "Menta" } },
+                { word: "Miel", hints: { easy: "Abeja", medium: "Dulce", hard: "Oso", very_hard: "Pegajoso" } },
+                { word: "Arroz", hints: { easy: "Blanco", medium: "Chino", hard: "Grano", very_hard: "Boda" } }
+            ],
+            animales: [
+                { word: "Alejandro", hints: { easy: "Andaluz cordobés ", medium: "Amigo", hard: "es un poco goofy", very_hard: "se partió la uretra" } },
+                { word: "Perro", hints: { easy: "Ladrido", medium: "Amigo", hard: "Hueso", very_hard: "Correa" } },
+                { word: "Gato", hints: { easy: "Maullido", medium: "Bigotes", hard: "Siete vidas", very_hard: "Arena" } },
+                { word: "León", hints: { easy: "Rey", medium: "Selva", hard: "Melena", very_hard: "Rugido" } },
+                { word: "Elefante", hints: { easy: "Grande", medium: "Trompa", hard: "Memoria", very_hard: "Marfil" } },
+                { word: "Tiburón", hints: { easy: "Mar", medium: "Dientes", hard: "Aleta", very_hard: "Miedo" } },
+                { word: "Pingüino", hints: { easy: "Frío", medium: "Ave", hard: "Frac", very_hard: "Hielo" } },
+                { word: "Mono", hints: { easy: "Banana", medium: "Árbol", hard: "Parecido", very_hard: "Cola" } },
+                { word: "Serpiente", hints: { easy: "Larga", medium: "Veneno", hard: "Arrastrarse", very_hard: "Siseo" } },
+                { word: "Águila", hints: { easy: "Volar", medium: "Garra", hard: "Visión", very_hard: "Pico" } },
+                { word: "Ballena", hints: { easy: "Gigante", medium: "Mar", hard: "Mamífero", very_hard: "Espiráculo" } },
+                { word: "Jirafa", hints: { easy: "Alta", medium: "Cuello", hard: "Manchas", very_hard: "África" } },
+                { word: "Caballo", hints: { easy: "Montar", medium: "Galope", hard: "Crin", very_hard: "Establo" } },
+                { word: "Vaca", hints: { easy: "Leche", medium: "Granja", hard: "Muu", very_hard: "Pasto" } },
+                { word: "Cerdo", hints: { easy: "Rosa", medium: "Jamón", hard: "Barro", very_hard: "Morro" } },
+                { word: "Oveja", hints: { easy: "Lana", medium: "Rebaño", hard: "Dormir", very_hard: "Bala" } },
+                { word: "Gallina", hints: { easy: "Huevo", medium: "Granja", hard: "Plumas", very_hard: "Cresta" } },
+                { word: "Ratón", hints: { easy: "Pequeño", medium: "Queso", hard: "Trampa", very_hard: "Cola" } },
+                { word: "Murciélago", hints: { easy: "Noche", medium: "Volar", hard: "Cueva", very_hard: "Radar" } },
+                { word: "Cocodrilo", hints: { easy: "Rio", medium: "Dientes", hard: "Piel", very_hard: "Verde" } },
+                { word: "Tortuga", hints: { easy: "Lenta", medium: "Caparazón", hard: "Verde", very_hard: "Longeva" } },
+                { word: "Rana", hints: { easy: "Saltar", medium: "Verde", hard: "Príncipe", very_hard: "Charca" } },
+                { word: "Oso", hints: { easy: "Miel", medium: "Hibernar", hard: "Pelo", very_hard: "Garra" } },
+                { word: "Lobo", hints: { easy: "Aullar", medium: "Luna", hard: "Manada", very_hard: "Caperucita" } },
+                { word: "Canguro", hints: { easy: "Australia", medium: "Saltar", hard: "Bolsa", very_hard: "Boxeo" } },
+                { word: "Panda", hints: { easy: "Bambú", medium: "China", hard: "Blanco y negro", very_hard: "Oso" } },
+                { word: "Delfín", hints: { easy: "Inteligente", medium: "Mar", hard: "Salto", very_hard: "Sonar" } },
+                { word: "Pulpo", hints: { easy: "Tentáculos", medium: "Tinta", hard: "Mar", very_hard: "Ocho" } },
+                { word: "Araña", hints: { easy: "Patas", medium: "Telaraña", hard: "Miedo", very_hard: "Veneno" } },
+                { word: "Mosquito", hints: { easy: "Picadura", medium: "Sangre", hard: "Zumbido", very_hard: "Verano" } },
+                { word: "Mariposa", hints: { easy: "Alas", medium: "Colores", hard: "Oruga", very_hard: "Flor" } }
+            ],
+            profesiones: [
+                { word: "Doctor", hints: { easy: "Salud", medium: "Hospital", hard: "Bata", very_hard: "Estetoscopio" } },
+                { word: "Profesor", hints: { easy: "Escuela", medium: "Enseñar", hard: "Pizarra", very_hard: "Examen" } },
+                { word: "Policía", hints: { easy: "Ley", medium: "Uniforme", hard: "Sirena", very_hard: "Multa" } },
+                { word: "Bombero", hints: { easy: "Fuego", medium: "Manguera", hard: "Camión", very_hard: "Casco" } },
+                { word: "Cocinero", hints: { easy: "Comida", medium: "Restaurante", hard: "Gorro", very_hard: "Sartén" } },
+                { word: "Astronauta", hints: { easy: "Espacio", medium: "Luna", hard: "Cohete", very_hard: "Gravedad" } },
+                { word: "Futbolista", hints: { easy: "Deporte", medium: "Balón", hard: "Gol", very_hard: "Estadio" } },
+                { word: "Mecánico", hints: { easy: "Coche", medium: "Taller", hard: "Grasa", very_hard: "Herramientas" } },
+                { word: "Peluquero", hints: { easy: "Pelo", medium: "Tijeras", hard: "Peinado", very_hard: "Espejo" } },
+                { word: "Piloto", hints: { easy: "Avión", medium: "Volar", hard: "Uniforme", very_hard: "Aeropuerto" } },
+                { word: "Jardinero", hints: { easy: "Plantas", medium: "Verde", hard: "Tierra", very_hard: "Regar" } },
+                { word: "Camarero", hints: { easy: "Bar", medium: "Bandeja", hard: "Propina", very_hard: "Pedido" } },
+                { word: "Juez", hints: { easy: "Ley", medium: "Mazo", hard: "Juicio", very_hard: "Toga" } },
+                { word: "Pintor", hints: { easy: "Cuadro", medium: "Brocha", hard: "Color", very_hard: "Pared" } },
+                { word: "Cantante", hints: { easy: "Música", medium: "Micrófono", hard: "Voz", very_hard: "Escenario" } },
+                { word: "Actor", hints: { easy: "Película", medium: "Famoso", hard: "Papel", very_hard: "Teatro" } },
+                { word: "Payaso", hints: { easy: "Circo", medium: "Risa", hard: "Nariz roja", very_hard: "Maquillaje" } },
+                { word: "Mago", hints: { easy: "Truco", medium: "Conejo", hard: "Sombrero", very_hard: "Carta" } },
+                { word: "Soldado", hints: { easy: "Ejército", medium: "Guerra", hard: "Arma", very_hard: "Uniforme" } },
+                { word: "Cura", hints: { easy: "Iglesia", medium: "Misa", hard: "Sotana", very_hard: "Dios" } },
+                { word: "Periodista", hints: { easy: "Noticia", medium: "Micrófono", hard: "Entrevista", very_hard: "Periódico" } },
+                { word: "Fotógrafo", hints: { easy: "Cámara", medium: "Foto", hard: "Flash", very_hard: "Retrato" } },
+                { word: "Carpintero", hints: { easy: "Madera", medium: "Mueble", hard: "Sierra", very_hard: "Martillo" } },
+                { word: "Fontanero", hints: { easy: "Agua", medium: "Tubería", hard: "Grifo", very_hard: "Fuga" } },
+                { word: "Electricista", hints: { easy: "Luz", medium: "Cable", hard: "Chispa", very_hard: "Enchufe" } },
+                { word: "Cartero", hints: { easy: "Carta", medium: "Buzón", hard: "Paquete", very_hard: "Correo" } },
+                { word: "Dentista", hints: { easy: "Dientes", medium: "Dolor", hard: "Silla", very_hard: "Sonrisa" } },
+                { word: "Veterinario", hints: { easy: "Animales", medium: "Médico", hard: "Perro", very_hard: "Clínica" } },
+                { word: "Albañil", hints: { easy: "Obra", medium: "Ladrillo", hard: "Cemento", very_hard: "Casa" } },
+                { word: "Científico", hints: { easy: "Laboratorio", medium: "Bata", hard: "Experimento", very_hard: "Fórmula" } }
+            ],
+            deportes: [
+                { word: "Fútbol", hints: { easy: "Balón", medium: "Gol", hard: "Once", very_hard: "Portería" } },
+                { word: "Baloncesto", hints: { easy: "Canasta", medium: "Alto", hard: "Naranja", very_hard: "NBA" } },
+                { word: "Tenis", hints: { easy: "Raqueta", medium: "Red", hard: "Nadal", very_hard: "Set" } },
+                { word: "Natación", hints: { easy: "Agua", medium: "Piscina", hard: "Nadar", very_hard: "Estilos" } },
+                { word: "Atletismo", hints: { easy: "Correr", medium: "Pista", hard: "Juegos Olímpicos", very_hard: "Velocidad" } },
+                { word: "Boxeo", hints: { easy: "Golpe", medium: "Ring", hard: "Guantes", very_hard: "Asalto" } },
+                { word: "Ciclismo", hints: { easy: "Bici", medium: "Tour", hard: "Casco", very_hard: "Pedalear" } },
+                { word: "Golf", hints: { easy: "Hoyo", medium: "Palo", hard: "Verde", very_hard: "Caddy" } },
+                { word: "Voleibol", hints: { easy: "Red", medium: "Playa", hard: "Mano", very_hard: "Salto" } },
+                { word: "Rugby", hints: { easy: "Placaje", medium: "Melé", hard: "Balón ovalado", very_hard: "Ensayo" } },
+                { word: "Béisbol", hints: { easy: "Bate", medium: "Home run", hard: "Gorra", very_hard: "Base" } },
+                { word: "Esquí", hints: { easy: "Nieve", medium: "Montaña", hard: "Bastones", very_hard: "Descenso" } },
+                { word: "Fórmula 1", hints: { easy: "Coche", medium: "Carrera", hard: "Circuito", very_hard: "Motor" } },
+                { word: "Surf", hints: { easy: "Ola", medium: "Tabla", hard: "Mar", very_hard: "Equilibrio" } },
+                { word: "Karate", hints: { easy: "Artes marciales", medium: "Cinturón", hard: "Kimono", very_hard: "Dojo" } },
+                { word: "Ping Pong", hints: { easy: "Mesa", medium: "Pala", hard: "China", very_hard: "Red" } },
+                { word: "Bádminton", hints: { easy: "Pluma", medium: "Raqueta", hard: "Red", very_hard: "Ligero" } },
+                { word: "Hockey", hints: { easy: "Stick", medium: "Hielo", hard: "Pastilla", very_hard: "Patines" } },
+                { word: "Pádel", hints: { easy: "Cristal", medium: "Pareja", hard: "Pala", very_hard: "Pared" } },
+                { word: "Gimnasia", hints: { easy: "Flexible", medium: "Juegos", hard: "Aro", very_hard: "Suelo" } },
+                { word: "Escalada", hints: { easy: "Roca", medium: "Altura", hard: "Cuerda", very_hard: "Arnés" } },
+                { word: "Patinaje", hints: { easy: "Ruedas", medium: "Suelo", hard: "Deslizar", very_hard: "Casco" } },
+                { word: "Balonmano", hints: { easy: "Mano", medium: "Portería", hard: "Siete", very_hard: "Cancha" } },
+                { word: "Waterpolo", hints: { easy: "Piscina", medium: "Balón", hard: "Gorro", very_hard: "Flotar" } },
+                { word: "Judo", hints: { easy: "Llave", medium: "Tatami", hard: "Japón", very_hard: "Agarre" } },
+                { word: "Esgrima", hints: { easy: "Espada", medium: "Máscara", hard: "Blanco", very_hard: "Tocado" } },
+                { word: "Tiro con arco", hints: { easy: "Flecha", medium: "Diana", hard: "Puntería", very_hard: "Robin Hood" } },
+                { word: "Bolos", hints: { easy: "Strike", medium: "Bola", hard: "Diez", very_hard: "Zapatos" } },
+                { word: "Billar", hints: { easy: "Taco", medium: "Bolas", hard: "Mesa verde", very_hard: "Agujero" } },
+                { word: "Ajedrez", hints: { easy: "Tablero", medium: "Rey", hard: "Estrategia", very_hard: "Jaque" } }
+            ],
+            instrumentos: [
+                { word: "Guitarra", hints: { easy: "Cuerdas", medium: "Tocar", hard: "Española", very_hard: "Púa" } },
+                { word: "Piano", hints: { easy: "Teclas", medium: "Blanco y negro", hard: "Cola", very_hard: "Pedal" } },
+                { word: "Batería", hints: { easy: "Baquetas", medium: "Ritmo", hard: "Platillo", very_hard: "Ruido" } },
+                { word: "Violín", hints: { easy: "Arco", medium: "Cuello", hard: "Orquesta", very_hard: "Agudo" } },
+                { word: "Trompeta", hints: { easy: "Viento", medium: "Dorado", hard: "Jazz", very_hard: "Boquilla" } },
+                { word: "Flauta", hints: { easy: "Soplar", medium: "Agujeros", hard: "Colegio", very_hard: "Dulce" } },
+                { word: "Saxofón", hints: { easy: "Jazz", medium: "Dorado", hard: "Curvo", very_hard: "Lisa Simpson" } },
+                { word: "Acordeón", hints: { easy: "Fuelle", medium: "Teclas", hard: "Pecho", very_hard: "Aire" } },
+                { word: "Arpa", hints: { easy: "Ángel", medium: "Cuerdas", hard: "Grande", very_hard: "Dedos" } },
+                { word: "Ukelele", hints: { easy: "Pequeño", medium: "Hawai", hard: "Cuatro cuerdas", very_hard: "Guitarra" } },
+                { word: "Maracas", hints: { easy: "Agitar", medium: "Par", hard: "Ritmo", very_hard: "Salsa" } },
+                { word: "Pandereta", hints: { easy: "Golpear", medium: "Cascabeles", hard: "Navidad", very_hard: "Mano" } },
+                { word: "Xilófono", hints: { easy: "Golpear", medium: "Madera", hard: "Escala", very_hard: "Mazo" } },
+                { word: "Gaita", hints: { easy: "Escocia", medium: "Soplar", hard: "Falda", very_hard: "Aire" } },
+                { word: "Clarinete", hints: { easy: "Negro", medium: "Viento", hard: "Calamardo", very_hard: "Madera" } },
+                { word: "Trombón", hints: { easy: "Vara", medium: "Estirar", hard: "Metal", very_hard: "Largo" } },
+                { word: "Bajo", hints: { easy: "Grave", medium: "Cuatro cuerdas", hard: "Ritmo", very_hard: "Eléctrico" } },
+                { word: "Armónica", hints: { easy: "Boca", medium: "Bolsillo", hard: "Blues", very_hard: "Metal" } },
+                { word: "Triángulo", hints: { easy: "Metal", medium: "Geometría", hard: "Tintineo", very_hard: "Orquesta" } },
+                { word: "Bombo", hints: { easy: "Grande", medium: "Grave", hard: "Tambor", very_hard: "Mazo" } },
+                { word: "Platillos", hints: { easy: "Chocar", medium: "Metal", hard: "Ruido", very_hard: "Pares" } },
+                { word: "Castañuelas", hints: { easy: "Manos", medium: "España", hard: "Flamenco", very_hard: "Madera" } },
+                { word: "Violonchelo", hints: { easy: "Sentado", medium: "Grande", hard: "Suelo", very_hard: "Grave" } },
+                { word: "Tuba", hints: { easy: "Gigante", medium: "Grave", hard: "Metal", very_hard: "Viento" } },
+                { word: "Oboe", hints: { easy: "Viento", medium: "Madera", hard: "Doble caña", very_hard: "Orquesta" } },
+                { word: "Banjo", hints: { easy: "Redondo", medium: "Country", hard: "Cuerdas", very_hard: "América" } },
+                { word: "Sitar", hints: { easy: "India", medium: "Cuerdas", hard: "Suelo", very_hard: "Exótico" } },
+                { word: "Gong", hints: { easy: "Chino", medium: "Golpe", hard: "Disco", very_hard: "Suspenso" } },
+                { word: "Bongo", hints: { easy: "Tambor", medium: "Manos", hard: "Pareja", very_hard: "Cuba" } },
+                { word: "Micrófono", hints: { easy: "Voz", medium: "Cantar", hard: "Amplificar", very_hard: "Karaoke" } }
+            ],
+            ropa: [
+                { word: "Camiseta", hints: { easy: "Manga", medium: "Algodón", hard: "Verano", very_hard: "Torso" } },
+                { word: "Pantalón", hints: { easy: "Piernas", medium: "Largo", hard: "Vaquero", very_hard: "Cintura" } },
+                { word: "Zapatos", hints: { easy: "Pies", medium: "Suela", hard: "Cordones", very_hard: "Caminar" } },
+                { word: "Calcetines", hints: { easy: "Pies", medium: "Par", hard: "Interior", very_hard: "Olor" } },
+                { word: "Gorra", hints: { easy: "Cabeza", medium: "Sol", hard: "Visera", very_hard: "Deporte" } },
+                { word: "Bufanda", hints: { easy: "Cuello", medium: "Invierno", hard: "Lana", very_hard: "Larga" } },
+                { word: "Guantes", hints: { easy: "Manos", medium: "Frío", hard: "Dedos", very_hard: "Par" } },
+                { word: "Abrigo", hints: { easy: "Frío", medium: "Invierno", hard: "Grueso", very_hard: "Botones" } },
+                { word: "Vestido", hints: { easy: "Mujer", medium: "Una pieza", hard: "Falda", very_hard: "Elegante" } },
+                { word: "Falda", hints: { easy: "Piernas", medium: "Mujer", hard: "Vuelo", very_hard: "Corta/Larga" } },
+                { word: "Corbata", hints: { easy: "Cuello", medium: "Traje", hard: "Nudo", very_hard: "Formal" } },
+                { word: "Cinturón", hints: { easy: "Cintura", medium: "Ajustar", hard: "Hebilla", very_hard: "Cuero" } },
+                { word: "Bañador", hints: { easy: "Agua", medium: "Playa", hard: "Nadar", very_hard: "Verano" } },
+                { word: "Pijama", hints: { easy: "Dormir", medium: "Cama", hard: "Noche", very_hard: "Cómodo" } },
+                { word: "Zapatillas", hints: { easy: "Deporte", medium: "Cómodo", hard: "Cordones", very_hard: "Correr" } },
+                { word: "Chanclas", hints: { easy: "Verano", medium: "Dedo", hard: "Playa", very_hard: "Suela" } },
+                { word: "Gafas", hints: { easy: "Ojos", medium: "Ver", hard: "Sol", very_hard: "Cristal" } },
+                { word: "Reloj", hints: { easy: "Muñeca", medium: "Tiempo", hard: "Hora", very_hard: "Tic-tac" } },
+                { word: "Anillo", hints: { easy: "Dedo", medium: "Joya", hard: "Boda", very_hard: "Oro" } },
+                { word: "Collar", hints: { easy: "Cuello", medium: "Joya", hard: "Colgante", very_hard: "Perlas" } },
+                { word: "Sudadera", hints: { easy: "Capucha", medium: "Deporte", hard: "Algodón", very_hard: "Informal" } },
+                { word: "Chaqueta", hints: { easy: "Cremallera", medium: "Abrir", hard: "Manga", very_hard: "Cuero" } },
+                { word: "Botas", hints: { easy: "Lluvia", medium: "Alto", hard: "Invierno", very_hard: "Pisada" } },
+                { word: "Sombrero", hints: { easy: "Cabeza", medium: "Ala", hard: "Elegante", very_hard: "Sol" } },
+                { word: "Traje", hints: { easy: "Boda", medium: "Elegante", hard: "Chaqueta", very_hard: "Negocios" } },
+                { word: "Bata", hints: { easy: "Casa", medium: "Ducha", hard: "Médico", very_hard: "Cinturón" } },
+                { word: "Chaleco", hints: { easy: "Sin mangas", medium: "Torso", hard: "Frío", very_hard: "Debajo" } },
+                { word: "Tacones", hints: { easy: "Alto", medium: "Mujer", hard: "Elegante", very_hard: "Ruido" } },
+                { word: "Mascarilla", hints: { easy: "Boca", medium: "Virus", hard: "Goma", very_hard: "Protección" } },
+                { word: "Mochila", hints: { easy: "Espalda", medium: "Cargar", hard: "Escuela", very_hard: "Cierre" } }
+            ]
+        };
 
     function toggleTheme() {
         const checkbox = document.getElementById('checkbox-theme');
-        if(checkbox.checked) { document.body.classList.add('light-mode'); localStorage.setItem('theme', 'light'); }
-        else { document.body.classList.remove('light-mode'); localStorage.setItem('theme', 'dark'); }
+        if(checkbox.checked) {
+            document.body.classList.add('light-mode');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.body.classList.remove('light-mode');
+            localStorage.setItem('theme', 'dark');
+        }
     }
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') { document.body.classList.add('light-mode'); document.getElementById('checkbox-theme').checked = true; }
-
-    function shareWhatsApp() {
-        const url = window.location.href;
-        const message = `🕵️ ¡Únete a la partida!\n🔗 ${url}\n🔑 Código: *${roomId}*`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-    }
 
     function switchScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
         document.getElementById('review-overlay').style.display = 'none';
-        if(screenId === 'game-screen') requestWakeLock();
     }
 
-    function selectMode(mode) {
-        CURRENT_MODE = mode;
-        if(mode === 'online') switchScreen('online-home-screen');
-        else switchScreen('offline-setup-screen');
+    function exitGame() {
+        if(confirm("¿Seguro que quieres salir de la sala?")) {
+            if(roomId && myId) { db.ref('rooms/' + roomId + '/players/' + myId).remove(); }
+            window.location.reload();
+        }
     }
 
-    function goBackToMode() {
-        switchScreen('mode-selection-screen');
-        if (roomId && myId && CURRENT_MODE === 'online') { db.ref('rooms/' + roomId + '/players/' + myId).remove(); }
-        roomId = "";
-    }
-
-    function disableButton(btnId) {
-        const btn = document.getElementById(btnId);
-        if(btn) btn.disabled = true;
-        setTimeout(() => { if(btn) btn.disabled = false; }, 2000); 
-    }
-
-    // --- ONLINE ---
     function createRoom() {
-        disableButton('btn-create');
-        const name = document.getElementById('player-name-input').value.trim().replace(/[.<>$]/g, ""); 
+        const name = document.getElementById('player-name-input').value.trim();
         if (!name) return alert("Escribe tu nombre.");
         myName = name; isHost = true;
         roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const initialSettings = { imposterCount: "random", category: "random", difficulty: "medium" };
+        const initialSettings = { imposterCount: "1", category: "random", difficulty: "medium" };
         db.ref('rooms/' + roomId).set({ status: 'lobby', settings: initialSettings, createdAt: firebase.database.ServerValue.TIMESTAMP }).then(() => { joinGameLogic(); });
     }
 
     function joinRoom() {
-        disableButton('btn-join');
-        const name = document.getElementById('player-name-input').value.trim().replace(/[.<>$]/g, "");
-        const code = document.getElementById('room-code-input').value.trim().toUpperCase().replace(/\s/g, '');
+        const name = document.getElementById('player-name-input').value.trim();
+        const code = document.getElementById('room-code-input').value.trim().toUpperCase();
         if (!name) return alert("Escribe tu nombre.");
         if (!code) return alert("Escribe el código.");
         myName = name; roomId = code; isHost = false;
@@ -524,7 +550,7 @@
         const playerRef = db.ref('rooms/' + roomId + '/players').push();
         myId = playerRef.key; localStorage.setItem('impostor_myId', myId);
         playerRef.onDisconnect().remove();
-        playerRef.set({ name: myName, isHost: isHost, score: 0 }).then(() => { enterLobbyUI(); listenToRoom(); }).catch(err => { alert("Error: " + err.message); });
+        playerRef.set({ name: myName, isHost: isHost }).then(() => { enterLobbyUI(); listenToRoom(); }).catch(err => { alert("Error: " + err.message); });
     }
 
     function enterLobbyUI() {
@@ -534,7 +560,7 @@
     }
 
     function syncSettings() {
-        if (!isHost || CURRENT_MODE === 'offline') return;
+        if (!isHost) return;
         const settings = {
             imposterCount: document.getElementById('imposter-count').value,
             category: document.getElementById('category-select').value,
@@ -544,35 +570,29 @@
     }
 
     function updateUIForHost() {
-        if (CURRENT_MODE === 'offline') return;
         const selects = ['imposter-count', 'category-select', 'difficulty-select'];
         const startBtn = document.getElementById('btn-start-game');
         const waitMsg = document.getElementById('waiting-msg');
         const statusText = document.getElementById('settings-status-text');
-        
         const gameControls = document.getElementById('host-game-controls');
-        const voteControls = document.getElementById('host-voting-controls'); // Nuevo
-        const scoreControls = document.getElementById('host-score-controls');
         const restartControls = document.getElementById('host-restart-controls');
-        const clientWait = document.getElementById('client-wait-restart');
+        const restartWait = document.getElementById('waiting-restart');
 
         if (isHost) {
             selects.forEach(id => document.getElementById(id).disabled = false);
             startBtn.style.display = 'block'; waitMsg.style.display = 'none'; statusText.innerText = "(Tú eres el anfitrión)";
             if(document.getElementById('game-screen').classList.contains('active')) gameControls.style.display = 'block';
-            if(document.getElementById('voting-screen').classList.contains('active')) voteControls.style.display = 'block';
-            if(document.getElementById('result-screen').classList.contains('active')) { scoreControls.style.display = 'block'; restartControls.style.display = 'block'; clientWait.style.display = 'none'; }
+            if(document.getElementById('result-screen').classList.contains('active')) { restartControls.style.display = 'block'; restartWait.style.display = 'none'; }
         } else {
             selects.forEach(id => document.getElementById(id).disabled = true);
             startBtn.style.display = 'none'; waitMsg.style.display = 'block'; statusText.innerText = "(Solo lectura)";
-            gameControls.style.display = 'none'; voteControls.style.display = 'none'; scoreControls.style.display = 'none'; restartControls.style.display = 'none';
-            if(document.getElementById('result-screen').classList.contains('active')) clientWait.style.display = 'block';
+            gameControls.style.display = 'none'; restartControls.style.display = 'none';
+            if(document.getElementById('result-screen').classList.contains('active')) restartWait.style.display = 'block';
         }
     }
 
     function listenToRoom() {
         const roomRef = db.ref('rooms/' + roomId);
-        
         roomRef.child('players').on('value', snapshot => {
             const list = document.getElementById('player-list-lobby'); list.innerHTML = ""; playersInRoom = [];
             let hostExists = false; let firstPlayerId = null;
@@ -582,7 +602,7 @@
                 if (p.isHost) hostExists = true;
                 playersInRoom.push(p);
                 const li = document.createElement('li'); li.className = 'lobby-player';
-                li.innerHTML = `<span>${p.isHost ? '<span class="host-badge">HOST</span>' : '👤'} ${p.name} ${p.id === myId ? '<span class="me-badge">TÚ</span>' : ''}</span> <span class="score-badge">${p.score || 0} pts</span>`;
+                li.innerHTML = `<span>${p.isHost ? '<span class="host-badge">HOST</span>' : '👤'} ${p.name}</span> ${p.id === myId ? '<span class="me-badge">TÚ</span>' : ''}`;
                 list.appendChild(li);
             });
             if (!hostExists && playersInRoom.length > 0 && myId === firstPlayerId) {
@@ -604,20 +624,13 @@
         roomRef.child('gameState').on('value', snapshot => {
             const state = snapshot.val();
             if (!state) return;
-            currentGameState = state;
-
             if (state.phase === 'assigned') {
                 if (state.roles && state.roles[myId]) {
                     mySavedRoleData = { ...state.roles[myId], categoryName: state.categoryName };
                     revealMyRole(mySavedRoleData);
-                } else {
-                    document.getElementById('role-text').innerText = "Sincronizando...";
-                    setTimeout(() => {}, 500); // Retry delay
                 }
             } else if (state.phase === 'playing') {
                 startLocalTimer(state.endTime, state.starterName);
-            } else if (state.phase === 'voting') {
-                showVotingScreen();
             } else if (state.phase === 'finished') {
                 showResults(state);
             } else if (state.phase === 'reset') {
@@ -629,90 +642,30 @@
     function startGame() {
         if (!isHost) return;
         if (playersInRoom.length < 3) return alert("Se necesitan al menos 3 jugadores.");
+        const imposterCount = parseInt(document.getElementById('imposter-count').value);
+        if (playersInRoom.length <= imposterCount) return alert("Demasiados impostores.");
         const categoryKey = document.getElementById('category-select').value;
         const difficulty = document.getElementById('difficulty-select').value;
-        const imposterSetting = document.getElementById('imposter-count').value;
-        startSharedGameLogic(playersInRoom, imposterSetting, categoryKey, difficulty);
-    }
 
-    // --- VOTACIÓN ONLINE ---
-    function startVotingGlobal() {
-        db.ref('rooms/' + roomId + '/gameState').update({ phase: 'voting' });
-    }
-
-    function showVotingScreen() {
-        clearInterval(timerInterval); // Parar el timer
-        switchScreen('voting-screen');
-        hasVoted = false;
-        document.getElementById('vote-status').innerText = "Toca un nombre para acusar:";
-        
-        const container = document.getElementById('voting-buttons-container');
-        container.innerHTML = "";
-
-        // Crear botones de votación para cada jugador
-        playersInRoom.forEach(p => {
-            // No puedes votarte a ti mismo (opcional, pero común)
-            if (p.id === myId) return;
-
-            const btn = document.createElement('button');
-            btn.className = 'vote-btn';
-            btn.innerHTML = `<span>👤 ${p.name}</span>`;
-            btn.onclick = () => castVote(p.id, btn);
-            container.appendChild(btn);
-        });
-        
-        updateUIForHost(); // Mostrar botón de forzar si soy host
-    }
-
-    function castVote(targetId, btnElement) {
-        if (hasVoted) return;
-        hasVoted = true;
-        
-        // Efecto visual
-        const allBtns = document.querySelectorAll('.vote-btn');
-        allBtns.forEach(b => b.style.opacity = '0.5');
-        btnElement.style.opacity = '1';
-        btnElement.classList.add('selected');
-        
-        document.getElementById('vote-status').innerText = "Voto enviado. Esperando a los demás...";
-
-        // Enviar a Firebase (votes/myId = targetId)
-        db.ref('rooms/' + roomId + '/gameState/votes/' + myId).set(targetId);
-    }
-
-    // --- LÓGICA COMPARTIDA ---
-    function calculateGameSetup(playersArray, imposterSetting, categoryKey, difficulty) {
         let keys = Object.keys(database);
         if (categoryKey !== 'random') keys = [categoryKey];
         const chosenCat = keys[Math.floor(Math.random() * keys.length)];
         const items = database[chosenCat];
         const secretItem = items[Math.floor(Math.random() * items.length)];
 
-        // CALCULAR NÚMERO DE IMPOSTORES
-        let imposterCount = 1;
-        if (imposterSetting === 'random') {
-            // Si hay pocos jugadores (menos de 5), forzar 1 impostor
-            if (playersArray.length < 5) imposterCount = 1;
-            else imposterCount = Math.random() < 0.5 ? 1 : 2;
-        } else {
-            imposterCount = parseInt(imposterSetting);
-        }
-
-        // Shuffle
-        let indices = playersArray.map((_, i) => i);
+        let indices = playersInRoom.map((_, i) => i);
         for (let i = indices.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [indices[i], indices[j]] = [indices[j], indices[i]];
         }
         
         const impostorIndices = indices.slice(0, imposterCount);
-        const starterIndex = Math.floor(Math.random() * playersArray.length);
-        const starterName = playersArray[starterIndex].name;
+        const starterIndex = Math.floor(Math.random() * playersInRoom.length);
+        const starterName = playersInRoom[starterIndex].name;
 
         let rolesMap = {};
         let impostorNames = [];
-
-        playersArray.forEach((p, i) => {
+        playersInRoom.forEach((p, i) => {
             let isImposter = impostorIndices.includes(i);
             if(isImposter) impostorNames.push(p.name);
             rolesMap[p.id] = {
@@ -723,48 +676,40 @@
             };
         });
 
-        return {
-            categoryName: chosenCat.toUpperCase(),
-            roles: rolesMap,
-            impostorNames: impostorNames,
-            secretWord: secretItem.word,
-            starterName: starterName
-        };
-    }
-
-    function startSharedGameLogic(players, imposterSetting, catKey, diff) {
-        const setup = calculateGameSetup(players, imposterSetting, catKey, diff);
         db.ref('rooms/' + roomId + '/gameState').set({
-            phase: 'assigned',
-            categoryName: setup.categoryName,
-            roles: setup.roles,
-            impostorNames: setup.impostorNames,
-            secretWord: setup.secretWord,
-            starterName: setup.starterName,
-            votes: {} // Reset votos
+            phase: 'assigned', categoryName: chosenCat.toUpperCase(), roles: rolesMap, impostorNames: impostorNames, secretWord: secretItem.word, starterName: starterName
         });
     }
 
     function confirmRoleSeen() {
-        if (CURRENT_MODE === 'online') {
-            switchScreen('game-screen');
-            document.getElementById('timer').innerText = "ESPERANDO...";
-            document.getElementById('starter-name').innerText = "...";
-            document.getElementById('btn-review-role').style.display = 'block';
-            document.getElementById('host-game-controls').style.display = 'none';
-            if(isHost) {
-                 const now = Date.now();
-                 const duration = 180 * 1000; 
-                 db.ref('rooms/' + roomId + '/gameState').update({
-                    phase: 'playing', startTime: now, endTime: now + duration
-                });
-            }
-        } else {
-            nextOfflinePlayer();
+        // Esta función se llama al pulsar "Entendido, Ocultar"
+        // Simplemente movemos al jugador a la pantalla de juego localmente
+        // pero en "modo espera" hasta que el timer arranque de verdad.
+        switchScreen('game-screen');
+        // Ocultamos el timer hasta que el server diga que ha empezado
+        document.getElementById('timer').innerText = "ESPERANDO...";
+        document.getElementById('starter-name').innerText = "...";
+        document.getElementById('waiting-others-msg').style.display = 'block'; // Mensaje de espera
+        
+        // Si somos el host, ahora enviamos la señal de start a todos
+        if(isHost) {
+             const now = Date.now();
+             const duration = 180 * 1000; 
+             db.ref('rooms/' + roomId + '/gameState').update({
+                phase: 'playing',
+                startTime: now,
+                endTime: now + duration
+            });
         }
     }
 
-    function goToGame() { confirmRoleSeen(); }
+    function goToGame() {
+        // Función Legacy (ya no se usa directamente por el botón, pero se mantiene por compatibilidad)
+        confirmRoleSeen();
+    }
+
+    function endGameGlobal() { db.ref('rooms/' + roomId + '/gameState').update({ phase: 'finished' }); }
+    function returnToLobbyGlobal() { db.ref('rooms/' + roomId + '/gameState').set({ phase: 'reset' }); }
 
     function revealMyRole(data) {
         switchScreen('role-screen');
@@ -779,160 +724,6 @@
         document.getElementById('category-display').innerText = "Categoría: " + data.categoryName;
     }
 
-    function startLocalTimer(endTime, starterName) {
-        switchScreen('game-screen');
-        document.getElementById('starter-name').innerText = starterName;
-        
-        if (CURRENT_MODE === 'online') {
-            updateUIForHost();
-            document.getElementById('offline-game-controls').style.display = 'none';
-            document.getElementById('btn-review-role').style.display = 'block';
-        } else {
-            document.getElementById('host-game-controls').style.display = 'none';
-            document.getElementById('offline-game-controls').style.display = 'block';
-            document.getElementById('btn-review-role').style.display = 'none';
-        }
-
-        if(timerInterval) clearInterval(timerInterval);
-        
-        timerInterval = setInterval(() => {
-            const now = Date.now();
-            const left = Math.max(0, Math.floor((endTime - now) / 1000));
-            const m = Math.floor(left / 60).toString().padStart(2,'0');
-            const s = (left % 60).toString().padStart(2,'0');
-            document.getElementById('timer').innerText = `${m}:${s}`;
-            if (left <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById('timer').innerText = "00:00";
-                if (CURRENT_MODE === 'online' && isHost) startVotingGlobal();
-            }
-        }, 1000);
-    }
-
-    function endGameGlobal() {
-        if (CURRENT_MODE === 'online') {
-            db.ref('rooms/' + roomId + '/gameState').update({ phase: 'finished' });
-        } else {
-            showResults(currentGameState);
-        }
-    }
-
-    function showResults(state) {
-        clearInterval(timerInterval);
-        switchScreen('result-screen');
-        document.getElementById('result-impostors').innerText = state.impostorNames.join(" y ");
-        document.getElementById('result-word').innerText = state.secretWord;
-
-        // Mostrar Resultados de Votación (Solo online)
-        const voteBox = document.getElementById('voting-results-display');
-        const votesList = document.getElementById('votes-list');
-        
-        if (CURRENT_MODE === 'online' && state.votes) {
-            voteBox.style.display = 'block';
-            votesList.innerHTML = "";
-            
-            // Contar votos
-            let voteCounts = {};
-            Object.values(state.votes).forEach(targetId => {
-                voteCounts[targetId] = (voteCounts[targetId] || 0) + 1;
-            });
-
-            // Mostrar lista
-            for (let [targetId, count] of Object.entries(voteCounts)) {
-                // Buscar nombre del jugador
-                const p = playersInRoom.find(pl => pl.id === targetId);
-                const name = p ? p.name : "Desconocido";
-                const isImp = state.roles[targetId] && state.roles[targetId].isImposter;
-                
-                const li = document.createElement('li');
-                li.innerHTML = `<b>${name}</b>: ${count} votos ${isImp ? '😈' : '😇'}`;
-                votesList.appendChild(li);
-            }
-        } else {
-            voteBox.style.display = 'none';
-        }
-
-        if (CURRENT_MODE === 'online') {
-            updateUIForHost();
-            document.getElementById('offline-restart-btn').style.display = 'none';
-        } else {
-            document.getElementById('host-score-controls').style.display = 'none';
-            document.getElementById('host-restart-controls').style.display = 'none';
-            document.getElementById('client-wait-restart').style.display = 'none';
-            document.getElementById('offline-restart-btn').style.display = 'block';
-        }
-    }
-
-    // --- OFFLINE FUNCTIONS ---
-    function handleEnterOffline(e) { if(e.key === 'Enter') addOfflinePlayer(); }
-    
-    function addOfflinePlayer() {
-        const input = document.getElementById('offline-new-player');
-        const name = input.value.trim();
-        if (name) {
-            offlinePlayers.push({ name: name, id: 'off-' + Date.now() + Math.random() });
-            input.value = "";
-            renderOfflineList();
-        }
-    }
-
-    function removeOfflinePlayer(index) {
-        offlinePlayers.splice(index, 1);
-        renderOfflineList();
-    }
-
-    function renderOfflineList() {
-        const list = document.getElementById('offline-player-list');
-        list.innerHTML = "";
-        offlinePlayers.forEach((p, i) => {
-            const li = document.createElement('li');
-            li.className = 'player-item';
-            li.innerHTML = `<span>👤 ${p.name}</span><button class="delete-btn" onclick="removeOfflinePlayer(${i})">✕</button>`;
-            list.appendChild(li);
-        });
-    }
-
-    function startOfflineGame() {
-        if (offlinePlayers.length < 3) return alert("Mínimo 3 jugadores.");
-        const imposterSetting = document.getElementById('offline-imposter-count').value;
-        // Validación offline simple para impostores fijos
-        if (imposterSetting !== 'random' && offlinePlayers.length <= parseInt(imposterSetting)) return alert("Demasiados impostores.");
-        
-        const categoryKey = document.getElementById('offline-category-select').value;
-        const difficulty = document.getElementById('offline-difficulty-select').value;
-
-        const setup = calculateGameSetup(offlinePlayers, imposterSetting, categoryKey, difficulty);
-        currentGameState = setup;
-        currentOfflineIndex = 0;
-        showOfflinePassScreen();
-    }
-
-    function showOfflinePassScreen() {
-        switchScreen('offline-pass-screen');
-        const p = offlinePlayers[currentOfflineIndex];
-        document.getElementById('offline-current-player-display').innerText = p.name;
-        document.getElementById('offline-current-player-text').innerText = p.name;
-    }
-
-    function showOfflineRole() {
-        const p = offlinePlayers[currentOfflineIndex];
-        const roleData = currentGameState.roles[p.id];
-        mySavedRoleData = { ...roleData, categoryName: currentGameState.categoryName }; 
-        revealMyRole(mySavedRoleData);
-    }
-
-    function nextOfflinePlayer() {
-        currentOfflineIndex++;
-        if (currentOfflineIndex < offlinePlayers.length) {
-            showOfflinePassScreen();
-        } else {
-            startLocalTimer(Date.now() + 180 * 1000, currentGameState.starterName);
-        }
-    }
-
-    function resetOfflineGame() { switchScreen('offline-setup-screen'); }
-
-    // Helpers
     function openRoleReview() {
         if (!mySavedRoleData) return;
         const card = document.getElementById('review-card-display');
@@ -946,22 +737,40 @@
         document.getElementById('review-category-display').innerText = "Categoría: " + mySavedRoleData.categoryName;
         document.getElementById('review-overlay').style.display = 'flex';
     }
+
     function closeRoleReview() { document.getElementById('review-overlay').style.display = 'none'; }
-    function exitGame() { if(confirm("¿Salir?")) { if(roomId && myId && CURRENT_MODE === 'online') db.ref('rooms/' + roomId + '/players/' + myId).remove(); window.location.reload(); } }
-    function distributePoints(winnerType) {
-        if (!isHost || !currentGameState || !currentGameState.roles) return;
-        const updates = {};
-        playersInRoom.forEach(p => {
-            const role = currentGameState.roles[p.id];
-            let currentScore = p.score || 0;
-            let pointsToAdd = 0;
-            if (winnerType === 'civilians' && role && !role.isImposter) pointsToAdd = 1;
-            if (winnerType === 'impostors' && role && role.isImposter) pointsToAdd = 3;
-            if (pointsToAdd > 0) { updates['players/' + p.id + '/score'] = currentScore + pointsToAdd; }
-        });
-        db.ref('rooms/' + roomId).update(updates).then(() => { returnToLobbyGlobal(); });
+
+    function startLocalTimer(endTime, starterName) {
+        switchScreen('game-screen');
+        // Ya ha empezado, quitamos mensajes de espera
+        document.getElementById('waiting-others-msg').style.display = 'none';
+        document.getElementById('starter-name').innerText = starterName;
+        
+        updateUIForHost();
+        if(timerInterval) clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            const now = Date.now();
+            const left = Math.max(0, Math.floor((endTime - now) / 1000));
+            const m = Math.floor(left / 60).toString().padStart(2,'0');
+            const s = (left % 60).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+            if (left <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer').innerText = "00:00";
+                if (isHost) { endGameGlobal(); }
+            }
+        }, 1000);
     }
-    function returnToLobbyGlobal() { if (CURRENT_MODE === 'online') { db.ref('rooms/' + roomId + '/gameState').set({ phase: 'reset' }); } }
+
+    function showResults(state) {
+        clearInterval(timerInterval);
+        switchScreen('result-screen');
+        document.getElementById('result-impostors').innerText = state.impostorNames.join(" y ");
+        document.getElementById('result-word').innerText = state.secretWord;
+        updateUIForHost();
+    }
+
     function resetLocalGame() { enterLobbyUI(); mySavedRoleData = null; }
 </script>
 </body>
