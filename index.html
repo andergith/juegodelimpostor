@@ -3,8 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego del Impostor - Votación</title>
     
+    <title>Jugar Juego del Impostor Online - Adivina la Palabra Secreta</title>
+    <meta name="description" content="La mejor web para jugar al juego del impostor online gratis con amigos o en persona. Un juego de deducción social, palabras y engaños sin descargar nada.">
+    <meta name="keywords" content="jugar juego del impostor, jugar juego del impostor online, juego del impostor palabras, juego social online, juego multijugador navegador">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tu-dominio-aqui.com/" /> <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tu-dominio-aqui.com/">
+    <meta property="og:title" content="Jugar Juego del Impostor Online - Gratis">
+    <meta property="og:description" content="Entra y descubre quién es el espía. Juega al impostor con tus amigos desde el móvil sin instalar nada.">
+    <meta property="og:image" content="https://tu-dominio-aqui.com/imagen-preview.jpg"> <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Juego del Impostor Online",
+      "applicationCategory": "Game",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "description": "Aplicación web gratuita para jugar al juego del impostor online o local con amigos. Deducción social y palabras secretas."
+    }
+    </script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -76,6 +98,22 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.3s ease;
+        }
+
+        /* SEO Text Footer inside container */
+        .seo-footer {
+            margin-top: 25px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 15px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: left;
+            line-height: 1.4;
+        }
+        .seo-footer h2 {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin: 0 0 5px 0;
         }
 
         /* UTILS */
@@ -177,9 +215,9 @@
 
 <div id="connection-status">⚠️ Sin conexión a internet</div>
 
-<div class="container">
+<main class="container">
     <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox-theme">
+        <label class="theme-switch" for="checkbox-theme" aria-label="Cambiar tema">
             <input type="checkbox" id="checkbox-theme" onchange="toggleTheme()">
             <div class="slider round">
                 <span class="icon" style="margin-left: 4px;">🌙</span>
@@ -188,34 +226,40 @@
         </label>
     </div>
 
-    <div id="mode-selection-screen" class="screen active">
-        <h1>🕵️ El Impostor</h1>
-        <p style="opacity: 0.8; margin-bottom: 20px;">Elige cómo quieres jugar:</p>
+    <section id="mode-selection-screen" class="screen active">
+        <h1>🕵️ Juego del Impostor</h1>
+        <p style="opacity: 0.8; margin-bottom: 20px;">Elige tu modo para <strong>jugar al juego del impostor</strong>:</p>
         <button class="mode-btn" onclick="selectMode('offline')">
             🏠 Jugar en Persona
             <span class="mode-subtext">1 solo móvil (Pasar y jugar)</span>
         </button>
         <button class="mode-btn secondary" onclick="selectMode('online')">
             🌐 Jugar Online
-            <span class="mode-subtext">Cada uno en su casa</span>
+            <span class="mode-subtext">Multijugador a distancia</span>
         </button>
-    </div>
+
+        <article class="seo-footer">
+            <h2>¿Cómo jugar al juego del impostor online?</h2>
+            <p>Bienvenido al mejor sitio para <strong>jugar al juego del impostor online</strong> gratis. Esta herramienta te permite crear partidas privadas con tus amigos.</p>
+            <p>Las reglas son simples: todos reciben una palabra secreta menos el impostor. Debéis debatir y votar para expulsarlo antes de que acabe el tiempo. ¡Ideal para fiestas y videollamadas!</p>
+        </article>
+    </section>
 
     <div id="online-home-screen" class="screen">
         <div class="header-game"><button onclick="goBackToMode()" class="exit-btn">← Volver</button></div>
-        <h1>Modo Online</h1>
-        <input type="text" id="player-name-input" placeholder="Tu Nombre" maxlength="12">
+        <h2>Modo Online</h2>
+        <input type="text" id="player-name-input" placeholder="Tu Nombre" maxlength="12" aria-label="Tu nombre">
         <div style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
             <button onclick="createRoom()" id="btn-create">👑 Crear Nueva Sala</button>
             <p style="margin: 15px 0; opacity: 0.7;">- O -</p>
-            <input type="text" id="room-code-input" placeholder="Código de Sala" style="text-transform: uppercase;">
+            <input type="text" id="room-code-input" placeholder="Código de Sala" style="text-transform: uppercase;" aria-label="Código de sala">
             <button class="secondary" onclick="joinRoom()" id="btn-join">Entrar en Sala</button>
         </div>
     </div>
 
     <div id="offline-setup-screen" class="screen">
         <div class="header-game"><button onclick="goBackToMode()" class="exit-btn">← Volver</button></div>
-        <h1>Modo Offline</h1>
+        <h2>Modo Offline</h2>
         <label style="margin-top:0;">Añadir Jugadores (min 3):</label>
         <div class="input-group">
             <input type="text" id="offline-new-player" placeholder="Ej: Ana" onkeypress="handleEnterOffline(event)" autocomplete="off">
@@ -341,7 +385,7 @@
 
     <div id="result-screen" class="screen">
         <div class="header-game"><button onclick="exitGame()" class="exit-btn">✕ Salir</button></div>
-        <h1>FIN DE PARTIDA</h1>
+        <h2>FIN DE PARTIDA</h2>
         
         <div id="voting-results-display" style="display:none; margin-bottom:20px; background: rgba(0,0,0,0.2); padding:10px; border-radius:10px;">
             <h3 style="font-size:1rem; margin-top:0;">Resultados Votación:</h3>
@@ -375,7 +419,7 @@
         
         <button id="offline-restart-btn" onclick="resetOfflineGame()" style="display:none; margin-top:20px;">🔄 VOLVER AL MENU</button>
     </div>
-</div>
+</main>
 
 <script>
     // --- FIREBASE ---
