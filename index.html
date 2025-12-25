@@ -3,36 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Juego del Impostor</title>
     
-    <title>Jugar Juego del Impostor Online - Adivina la Palabra Secreta</title>
-    <meta name="description" content="La mejor web para jugar al juego del impostor online gratis con amigos o en persona. Un juego de deducción social, palabras y engaños sin descargar nada.">
-    <meta name="keywords" content="jugar juego del impostor, jugar juego del impostor online, juego del impostor palabras, juego social online, juego multijugador navegador">
-    <meta name="robots" content="index, follow">
-
-    <!-- FAVICONS (usando el archivo subido: Logo SIURTEC 1.png) -->
-    <link rel="icon" type="image/png" href="imagenes/Logo%20SIURTEC%201.png">
-    <link rel="shortcut icon" href="imagenes/Logo%20SIURTEC%201.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="imagenes/Logo%20SIURTEC%201.png">
-
-    <link rel="canonical" href="https://tu-dominio-aqui.com/" /> <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tu-dominio-aqui.com/">
-    <meta property="og:title" content="Jugar Juego del Impostor Online - Gratis">
-    <meta property="og:description" content="Entra y descubre quién es el espía. Juega al impostor con tus amigos desde el móvil sin instalar nada.">
-    <meta property="og:image" content="https://tu-dominio-aqui.com/imagen-preview.jpg"> <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Juego del Impostor Online",
-      "applicationCategory": "Game",
-      "operatingSystem": "Web",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "EUR"
-      },
-      "description": "Aplicación web gratuita para jugar al juego del impostor online o local con amigos. Deducción social y palabras secretas."
-    }
-    </script>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta property="og:title" content="🕵️ Juego del Impostor">
+    <meta property="og:description" content="¿Podrás descubrir quién miente? Juega online o en persona con tus amigos.">
+    <meta property="og:image" content="logo.png">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#e94560">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -96,7 +76,7 @@
             -webkit-backdrop-filter: blur(16px);
             width: 90%;
             max-width: 420px;
-            max-height: 90vh;
+            max-height: 95vh;
             margin: 0 auto;
             position: relative;
             box-sizing: border-box;
@@ -104,25 +84,10 @@
             display: flex;
             flex-direction: column;
             transition: background-color 0.3s ease;
+            -ms-overflow-style: none; scrollbar-width: none;
         }
+        .container::-webkit-scrollbar { display: none; }
 
-        /* SEO Text Footer inside container */
-        .seo-footer {
-            margin-top: 25px;
-            border-top: 1px solid var(--glass-border);
-            padding-top: 15px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-align: left;
-            line-height: 1.4;
-        }
-        .seo-footer h2 {
-            font-size: 0.9rem;
-            color: var(--accent-color);
-            margin: 0 0 5px 0;
-        }
-
-        /* UTILS */
         #connection-status {
             position: fixed; top: 0; left: 0; width: 100%; 
             background: var(--danger-color); color: white; 
@@ -130,8 +95,15 @@
             display: none; font-weight: bold; text-align: center;
         }
         
-        /* Toggle Theme */
-        .theme-switch-wrapper { position: absolute; top: 25px; left: 20px; display: flex; align-items: center; z-index: 10; }
+        .theme-switch-wrapper { 
+            position: absolute; 
+            top: 10px; 
+            left: 30px; 
+            display: flex; 
+            align-items: center; 
+            z-index: 10; 
+        }
+
         .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
         .theme-switch input { display: none; }
         .slider { background-color: rgba(0,0,0,0.3); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 14px; }
@@ -139,10 +111,6 @@
         .slider:before { background-color: #fff; bottom: 3px; content: ""; height: 20px; left: 4px; position: absolute; transition: .4s; width: 20px; border-radius: 50%; z-index: 2; }
         input:checked + .slider { background-color: var(--accent-color); }
         input:checked + .slider:before { transform: translateX(22px); }
-
-        /* APP LOGO */
-        .app-logo { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:12px; }
-        .site-logo { width:64px; height:64px; border-radius:8px; object-fit:cover; box-shadow: 0 6px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); }
 
         h1 { margin-bottom: 1rem; color: var(--accent-color); text-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-top: 10px; }
         .screen { display: none; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; }
@@ -176,20 +144,8 @@
         button.exit-btn { width: auto; padding: 5px 12px; font-size: 0.8rem; background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); margin: 0; box-shadow: none; }
         button.whatsapp-btn { background-color: var(--whatsapp-color); font-size: 0.9rem; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
-        /* Botones de Votación */
-        .vote-btn {
-            background-color: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            text-align: left;
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .vote-btn.selected {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-        }
+        .vote-btn { background-color: var(--input-bg); border: 1px solid var(--glass-border); text-align: left; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .vote-btn.selected { background-color: var(--accent-color); border-color: var(--accent-color); }
 
         .mode-btn { padding: 25px; font-size: 1.3rem; margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .mode-subtext { font-size: 0.8rem; font-weight: normal; opacity: 0.8; }
@@ -202,14 +158,28 @@
         .host-badge { font-size: 0.7rem; background: #f1c40f; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-right: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         .score-badge { font-size: 0.9rem; font-weight: bold; color: var(--accent-color); background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; }
 
-        .role-card { background: var(--input-bg); color: var(--text-main); padding: 30px 20px; border-radius: 20px; margin: 20px 0; font-size: 2rem; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .role-card { 
+            background: var(--input-bg); color: var(--text-main); padding: 30px 20px; border-radius: 20px; margin: 20px 0; 
+            font-size: 2rem; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            min-height: 150px; height: auto; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            overflow: visible;
+        }
         .imposter-reveal { background: rgba(255, 71, 87, 0.2); border: 1px solid var(--danger-color); color: var(--danger-color); }
         .hint-box { display: block; margin-top: 15px; font-size: 1rem; font-weight: 500; background: rgba(0,0,0,0.1); color: var(--text-main); padding: 15px; border-radius: 12px; width: 100%; box-sizing: border-box; }
         
         #timer { font-size: 4rem; margin: 10px 0; font-weight: 800; color: var(--accent-color); font-family: 'Courier New', monospace; text-shadow: 0 0 20px rgba(0,0,0,0.1); }
         .room-code-display { font-size: 2.5rem; font-weight: bold; letter-spacing: 5px; color: var(--success-color); margin: 5px 0; background: var(--input-bg); padding: 5px; border-radius: 10px; }
 
-        #review-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--glass-bg); z-index: 2000; padding: 20px; box-sizing: border-box; display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 24px; backdrop-filter: blur(20px); overflow-y: auto; }
+        #review-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--glass-bg); z-index: 2000; 
+            padding: 20px; box-sizing: border-box; display: none; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            border-radius: 24px; backdrop-filter: blur(20px); overflow-y: auto;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        #review-overlay::-webkit-scrollbar { display: none; }
+
         .close-icon-overlay { position: absolute; top: 20px; right: 25px; font-size: 2.5rem; color: var(--text-main); cursor: pointer; z-index: 2001; font-weight: bold; line-height: 1; }
         
         .lobby-settings-box { border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 10px; text-align: left; }
@@ -225,9 +195,9 @@
 
 <div id="connection-status">⚠️ Sin conexión a internet</div>
 
-<main class="container">
+<div class="container">
     <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox-theme" aria-label="Cambiar tema">
+        <label class="theme-switch" for="checkbox-theme">
             <input type="checkbox" id="checkbox-theme" onchange="toggleTheme()">
             <div class="slider round">
                 <span class="icon" style="margin-left: 4px;">🌙</span>
@@ -236,41 +206,34 @@
         </label>
     </div>
 
-    <section id="mode-selection-screen" class="screen active">
-        <div class="app-logo"><img src="imagenes/Logo%20SIURTEC%201.png" alt="SIURTEC" class="site-logo"></div>
-        <h1>🕵️ Juego del Impostor</h1>
-        <p style="opacity: 0.8; margin-bottom: 20px;">Elige tu modo para <strong>jugar al juego del impostor</strong>:</p>
+    <div id="mode-selection-screen" class="screen active">
+        <h1>🕵️ El Impostor</h1>
+        <p style="opacity: 0.8; margin-bottom: 20px;">Elige cómo quieres jugar:</p>
         <button class="mode-btn" onclick="selectMode('offline')">
             🏠 Jugar en Persona
             <span class="mode-subtext">1 solo móvil (Pasar y jugar)</span>
         </button>
         <button class="mode-btn secondary" onclick="selectMode('online')">
             🌐 Jugar Online
-            <span class="mode-subtext">Multijugador a distancia</span>
+            <span class="mode-subtext">Cada uno en su casa</span>
         </button>
-
-        <article class="seo-footer">
-            <h2>¿Cómo jugar al juego del impostor online?</h2>
-            <p>Bienvenido al mejor sitio para <strong>jugar al juego del impostor online</strong> gratis. Esta herramienta te permite crear partidas privadas con tus amigos.</p>
-            <p>Las reglas son simples: todos reciben una palabra secreta menos el impostor. Debéis debatir y votar para expulsarlo antes de que acabe el tiempo. ¡Ideal para fiestas y videollamadas!</p>
-        </article>
-    </section>
+    </div>
 
     <div id="online-home-screen" class="screen">
         <div class="header-game"><button onclick="goBackToMode()" class="exit-btn">← Volver</button></div>
-        <h2>Modo Online</h2>
-        <input type="text" id="player-name-input" placeholder="Tu Nombre" maxlength="12" aria-label="Tu nombre">
+        <h1>Modo Online</h1>
+        <input type="text" id="player-name-input" placeholder="Tu Nombre" maxlength="12">
         <div style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
             <button onclick="createRoom()" id="btn-create">👑 Crear Nueva Sala</button>
             <p style="margin: 15px 0; opacity: 0.7;">- O -</p>
-            <input type="text" id="room-code-input" placeholder="Código de Sala" style="text-transform: uppercase;" aria-label="Código de sala">
+            <input type="text" id="room-code-input" placeholder="Código de Sala" style="text-transform: uppercase;">
             <button class="secondary" onclick="joinRoom()" id="btn-join">Entrar en Sala</button>
         </div>
     </div>
 
     <div id="offline-setup-screen" class="screen">
         <div class="header-game"><button onclick="goBackToMode()" class="exit-btn">← Volver</button></div>
-        <h2>Modo Offline</h2>
+        <h1>Modo Offline</h1>
         <label style="margin-top:0;">Añadir Jugadores (min 3):</label>
         <div class="input-group">
             <input type="text" id="offline-new-player" placeholder="Ej: Ana" onkeypress="handleEnterOffline(event)" autocomplete="off">
@@ -280,9 +243,10 @@
         <div class="lobby-settings-box">
             <label>CONFIGURACIÓN</label>
             <select id="offline-imposter-count">
-                <option value="random" selected>🎲 Aleatorio (1 o 2)</option>
+                <option value="random" selected>🎲 Aleatorio (1, 2 o 3)</option>
                 <option value="1">1 Impostor</option>
                 <option value="2">2 Impostores</option>
+                <option value="3">3 Impostores</option>
             </select>
             <select id="offline-category-select">
                 <option value="random">🎲 Categoría Aleatoria</option>
@@ -295,9 +259,14 @@
                 <option value="ropa">👕 Ropa</option>
             </select>
             <select id="offline-difficulty-select">
+                <option value="easy">🟢 Pista Fácil</option>
                 <option value="medium">🟡 Pista Media</option>
                 <option value="hard">🔴 Pista Difícil</option>
                 <option value="very_hard">💀 Pista Muy Difícil</option>
+            </select>
+            <select id="offline-imposter-sees-category">
+                <option value="no">🙈 Impostor NO ve Categoría</option>
+                <option value="yes">👁️ Impostor SÍ ve Categoría</option>
             </select>
             <button onclick="startOfflineGame()" class="btn-start-margin">Empezar Partida</button>
         </div>
@@ -315,7 +284,6 @@
         <div class="lobby-header">
             <button onclick="exitGame()" class="exit-btn">✕ Salir</button>
         </div>
-        <div style="display:flex; justify-content:center; margin-bottom:8px;"><img src="imagenes/Logo%20SIURTEC%201.png" alt="SIURTEC" style="width:48px;height:48px;border-radius:6px;object-fit:cover;border:1px solid rgba(255,255,255,0.06);box-shadow:0 6px 18px rgba(0,0,0,0.15);"></div>
         <h2 style="font-size: 0.9rem; opacity: 0.7; margin-bottom:5px;">CÓDIGO DE SALA:</h2>
         <div id="display-room-code" class="room-code-display">----</div>
         <button onclick="shareWhatsApp()" class="whatsapp-btn">📱 Compartir por WhatsApp</button>
@@ -324,9 +292,10 @@
         <div class="lobby-settings-box">
             <label>CONFIGURACIÓN <span id="settings-status-text" class="host-badge-settings"></span></label>
             <select id="imposter-count" onchange="syncSettings()">
-                <option value="random" selected>🎲 Aleatorio (1 o 2)</option>
+                <option value="random" selected>🎲 Aleatorio (1, 2 o 3)</option>
                 <option value="1">1 Impostor</option>
                 <option value="2">2 Impostores</option>
+                <option value="3">3 Impostores</option>
             </select>
             <select id="category-select" onchange="syncSettings()">
                 <option value="random">🎲 Categoría Aleatoria</option>
@@ -339,9 +308,14 @@
                 <option value="ropa">👕 Ropa</option>
             </select>
             <select id="difficulty-select" onchange="syncSettings()">
+                <option value="easy">🟢 Pista Fácil</option>
                 <option value="medium">🟡 Pista Media</option>
                 <option value="hard">🔴 Pista Difícil</option>
                 <option value="very_hard">💀 Pista Muy Difícil</option>
+            </select>
+            <select id="imposter-sees-category" onchange="syncSettings()">
+                <option value="no">🙈 Impostor NO ve Categoría</option>
+                <option value="yes">👁️ Impostor SÍ ve Categoría</option>
             </select>
             <button id="btn-start-game" onclick="startGame()" style="display:none;">🚀 EMPEZAR PARTIDA</button>
             <p id="waiting-msg" style="display:none; color: var(--success-color); animation: pulse 1.5s infinite; text-align: center; margin-top: 15px;">Esperando al anfitrión...</p>
@@ -397,7 +371,7 @@
 
     <div id="result-screen" class="screen">
         <div class="header-game"><button onclick="exitGame()" class="exit-btn">✕ Salir</button></div>
-        <h2>FIN DE PARTIDA</h2>
+        <h1>FIN DE PARTIDA</h1>
         
         <div id="voting-results-display" style="display:none; margin-bottom:20px; background: rgba(0,0,0,0.2); padding:10px; border-radius:10px;">
             <h3 style="font-size:1rem; margin-top:0;">Resultados Votación:</h3>
@@ -418,7 +392,15 @@
                 <button class="score-btn-civ" onclick="distributePoints('civilians')">😇 Ciudadanos (+1)</button>
                 <button class="score-btn-imp" onclick="distributePoints('impostors')">😈 Impostor (+3)</button>
             </div>
-            <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">(Esto reiniciará la partida)</p>
+            <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 10px;">(Puntuar reinicia la partida)</p>
+        </div>
+
+        <div id="offline-score-controls" style="display:none; margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+            <p style="font-size: 0.9rem; margin-bottom: 10px;">¿QUIÉN GANÓ?</p>
+            <div class="score-btn-group">
+                <button class="score-btn-civ" onclick="distributeOfflinePoints('civilians')">😇 Ciudadanos (+1)</button>
+                <button class="score-btn-imp" onclick="distributeOfflinePoints('impostors')">😈 Impostor (+3)</button>
+            </div>
         </div>
 
         <div id="host-restart-controls" style="display:none;">
@@ -429,12 +411,14 @@
             <p id="waiting-restart" style="animation: pulse 1.5s infinite;">Esperando al anfitrión...</p>
         </div>
         
-        <button id="offline-restart-btn" onclick="resetOfflineGame()" style="display:none; margin-top:20px;">🔄 VOLVER AL MENU</button>
+        <button id="offline-restart-btn" onclick="resetOfflineGame()" style="display:none; margin-top:20px; background:transparent; border:1px solid var(--glass-border); font-size:0.8rem;">Reiniciar sin puntuar</button>
     </div>
-</main>
+</div>
 
 <script>
-    // --- FIREBASE ---
+    // ---------------------------------------------------------
+    // TU CONFIGURACIÓN DE FIREBASE (YA INSERTADA)
+    // ---------------------------------------------------------
     const firebaseConfig = {
         apiKey: "AIzaSyCD9EZAZldGoBHv5-v9jQ8wfOSVPL9mu60",
         authDomain: "juego-del-impostor-9318e.firebaseapp.com",
@@ -448,6 +432,16 @@
 
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.database();
+
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
     const connectedRef = db.ref(".info/connected");
     connectedRef.on("value", (snap) => {
@@ -465,52 +459,55 @@
     let isHost = false;
     let playersInRoom = [];
     let offlinePlayers = [];
+    let offlineUsedWords = []; 
     let currentOfflineIndex = 0;
     let timerInterval;
     let mySavedRoleData = null; 
     let currentGameState = null;
-    let hasVoted = false; // Control de votación local
+    let hasVoted = false;
 
+    // --- BASE DE DATOS DE PALABRAS ---
+    // Actualizada con 4 niveles de dificultad: easy, medium, hard, very_hard
     const database = {
         lugares: [
-            { word: "Playa", hints: { medium: "Arena", hard: "Sal", very_hard: "Marea" } },
-            { word: "Hospital", hints: { medium: "Silencio", hard: "Bata", very_hard: "Guardia" } },
-            { word: "Escuela", hints: { medium: "Pizarra", hard: "Recreo", very_hard: "Septiembre" } },
-            { word: "Cine", hints: { medium: "Palomitas", hard: "Butaca", very_hard: "Estreno" } },
-            { word: "Supermercado", hints: { medium: "Carrito", hard: "Pasillo", very_hard: "Bolsa" } },
-            { word: "Avión", hints: { medium: "Nubes", hard: "Maleta", very_hard: "Pasaporte" } },
-            { word: "Zoológico", hints: { medium: "Jaula", hard: "Safari", very_hard: "Domingo" } }
+            { word: "Playa", hints: { easy: "Arena", medium: "Sal", hard: "Marea", very_hard: "Litoral" } },
+            { word: "Hospital", hints: { easy: "Silencio", medium: "Bata", hard: "Guardia", very_hard: "Asepsia" } },
+            { word: "Escuela", hints: { easy: "Pizarra", medium: "Recreo", hard: "Septiembre", very_hard: "Pedagogía" } },
+            { word: "Cine", hints: { easy: "Palomitas", medium: "Butaca", hard: "Estreno", very_hard: "Proyector" } },
+            { word: "Supermercado", hints: { easy: "Carrito", medium: "Pasillo", hard: "Bolsa", very_hard: "Góndola" } },
+            { word: "Avión", hints: { easy: "Nubes", medium: "Maleta", hard: "Pasaporte", very_hard: "Presurización" } },
+            { word: "Zoológico", hints: { easy: "Jaula", medium: "Safari", hard: "Domingo", very_hard: "Cautiverio" } }
         ],
         comida: [
-            { word: "Pizza", hints: { medium: "Italia", hard: "Caja", very_hard: "Triángulo" } },
-            { word: "Sushi", hints: { medium: "Japón", hard: "Palillos", very_hard: "Crudo" } },
-            { word: "Hamburguesa", hints: { medium: "Pan", hard: "Ketchup", very_hard: "Rápida" } },
-            { word: "Helado", hints: { medium: "Verano", hard: "Derrite", very_hard: "Cuchara" } },
-            { word: "Chocolate", hints: { medium: "Suiza", hard: "Tableta", very_hard: "Amargo" } },
-            { word: "Ensalada", hints: { medium: "Dieta", hard: "Aceite", very_hard: "Mezclar" } }
+            { word: "Pizza", hints: { easy: "Italia", medium: "Caja", hard: "Triángulo", very_hard: "Fermentación" } },
+            { word: "Sushi", hints: { easy: "Japón", medium: "Palillos", hard: "Crudo", very_hard: "Vinagre" } },
+            { word: "Hamburguesa", hints: { easy: "Pan", medium: "Ketchup", hard: "Rápida", very_hard: "Sésamo" } },
+            { word: "Helado", hints: { easy: "Verano", medium: "Derrite", hard: "Cuchara", very_hard: "Cremosidad" } },
+            { word: "Chocolate", hints: { easy: "Suiza", medium: "Tableta", hard: "Amargo", very_hard: "Temperado" } },
+            { word: "Ensalada", hints: { easy: "Dieta", medium: "Aceite", hard: "Mezclar", very_hard: "Aliño" } }
         ],
         animales: [
-            { word: "Perro", hints: { medium: "Amigo", hard: "Hueso", very_hard: "Correa" } },
-            { word: "Gato", hints: { medium: "Bigotes", hard: "Siete vidas", very_hard: "Arena" } },
-            { word: "León", hints: { medium: "Selva", hard: "Melena", very_hard: "Rugido" } },
-            { word: "Elefante", hints: { medium: "Circo", hard: "Maní", very_hard: "Pesado" } },
-            { word: "Tiburón", hints: { medium: "Sangre", hard: "Terror", very_hard: "Surfista" } },
-            { word: "Pingüino", hints: { medium: "Traje", hard: "Huevo", very_hard: "Baile" } }
+            { word: "Perro", hints: { easy: "Amigo", medium: "Hueso", hard: "Correa", very_hard: "Olfato" } },
+            { word: "Gato", hints: { easy: "Bigotes", medium: "Siete vidas", hard: "Arena", very_hard: "Retráctil" } },
+            { word: "León", hints: { easy: "Selva", medium: "Melena", hard: "Rugido", very_hard: "Depredador" } },
+            { word: "Elefante", hints: { easy: "Circo", medium: "Maní", hard: "Pesado", very_hard: "Paquidermo" } },
+            { word: "Tiburón", hints: { easy: "Sangre", medium: "Terror", hard: "Surfista", very_hard: "Cartílago" } },
+            { word: "Pingüino", hints: { easy: "Traje", medium: "Huevo", hard: "Baile", very_hard: "Antártida" } }
         ],
         deportes: [
-            { word: "Fútbol", hints: { medium: "Gol", hard: "Once", very_hard: "Portería" } },
-            { word: "Baloncesto", hints: { medium: "Alto", hard: "Naranja", very_hard: "NBA" } },
-            { word: "Tenis", hints: { medium: "Red", hard: "Wimbledon", very_hard: "Ventaja" } }
+            { word: "Fútbol", hints: { easy: "Gol", medium: "Once", hard: "Portería", very_hard: "Estrategia" } },
+            { word: "Baloncesto", hints: { easy: "Alto", medium: "Naranja", hard: "NBA", very_hard: "Tablero" } },
+            { word: "Tenis", hints: { easy: "Red", medium: "Wimbledon", hard: "Ventaja", very_hard: "Deuce" } }
         ],
         instrumentos: [
-            { word: "Guitarra", hints: { medium: "Cuerdas", hard: "Púa", very_hard: "Traste" } },
-            { word: "Piano", hints: { medium: "Teclas", hard: "Cola", very_hard: "Pedal" } },
-            { word: "Batería", hints: { medium: "Ritmo", hard: "Platillos", very_hard: "Ruido" } }
+            { word: "Guitarra", hints: { easy: "Cuerdas", medium: "Púa", hard: "Traste", very_hard: "Resonancia" } },
+            { word: "Piano", hints: { easy: "Teclas", medium: "Cola", hard: "Pedal", very_hard: "Armonía" } },
+            { word: "Batería", hints: { easy: "Ritmo", medium: "Platillos", hard: "Ruido", very_hard: "Bombo" } }
         ],
         ropa: [
-            { word: "Camiseta", hints: { medium: "Algodón", hard: "Manga", very_hard: "Cuello" } },
-            { word: "Pantalón", hints: { medium: "Piernas", hard: "Cinturón", very_hard: "Bolsillos" } },
-            { word: "Zapatos", hints: { medium: "Suela", hard: "Cordones", very_hard: "Caminar" } }
+            { word: "Camiseta", hints: { easy: "Algodón", medium: "Manga", hard: "Cuello", very_hard: "Textil" } },
+            { word: "Pantalón", hints: { easy: "Piernas", medium: "Cinturón", hard: "Bolsillos", very_hard: "Dobladillo" } },
+            { word: "Zapatos", hints: { easy: "Suela", medium: "Cordones", hard: "Caminar", very_hard: "Empeine" } }
         ]
     };
 
@@ -553,20 +550,44 @@
         setTimeout(() => { if(btn) btn.disabled = false; }, 2000); 
     }
 
+    // --- FUNCIÓN SELECCIÓN PALABRA (Con Memoria) ---
+    function getUnusedWord(categoryKey, usedList) {
+        let candidateItems = [];
+        if (categoryKey === 'random') {
+            Object.keys(database).forEach(key => { candidateItems = candidateItems.concat(database[key]); });
+        } else {
+            candidateItems = database[categoryKey];
+        }
+
+        const availableItems = candidateItems.filter(item => !usedList.includes(item.word));
+
+        // Si se acaban, reciclamos
+        if (availableItems.length === 0) {
+            const randomItem = candidateItems[Math.floor(Math.random() * candidateItems.length)];
+            return { item: randomItem, reset: true }; 
+        }
+
+        const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+        return { item: randomItem, reset: false };
+    }
+
     // --- ONLINE ---
     function createRoom() {
         disableButton('btn-create');
-        const name = document.getElementById('player-name-input').value.trim().replace(/[.<>$]/g, ""); 
+        const rawName = document.getElementById('player-name-input').value.trim();
+        const name = escapeHtml(rawName); 
+        
         if (!name) return alert("Escribe tu nombre.");
         myName = name; isHost = true;
         roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
         const initialSettings = { imposterCount: "random", category: "random", difficulty: "medium" };
-        db.ref('rooms/' + roomId).set({ status: 'lobby', settings: initialSettings, createdAt: firebase.database.ServerValue.TIMESTAMP }).then(() => { joinGameLogic(); });
+        db.ref('rooms/' + roomId).set({ status: 'lobby', settings: initialSettings, usedWords: [], createdAt: firebase.database.ServerValue.TIMESTAMP }).then(() => { joinGameLogic(); });
     }
 
     function joinRoom() {
         disableButton('btn-join');
-        const name = document.getElementById('player-name-input').value.trim().replace(/[.<>$]/g, "");
+        const rawName = document.getElementById('player-name-input').value.trim();
+        const name = escapeHtml(rawName);
         const code = document.getElementById('room-code-input').value.trim().toUpperCase().replace(/\s/g, '');
         if (!name) return alert("Escribe tu nombre.");
         if (!code) return alert("Escribe el código.");
@@ -580,7 +601,7 @@
         const playerRef = db.ref('rooms/' + roomId + '/players').push();
         myId = playerRef.key; localStorage.setItem('impostor_myId', myId);
         playerRef.onDisconnect().remove();
-        playerRef.set({ name: myName, isHost: isHost, score: 0 }).then(() => { enterLobbyUI(); listenToRoom(); }).catch(err => { alert("Error: " + err.message); });
+        playerRef.set({ name: myName, isHost: isHost, score: 0 }).then(() => { enterLobbyUI(); listenToRoom(); }).catch(err => { alert("Error al entrar: " + err.message); });
     }
 
     function enterLobbyUI() {
@@ -594,32 +615,39 @@
         const settings = {
             imposterCount: document.getElementById('imposter-count').value,
             category: document.getElementById('category-select').value,
-            difficulty: document.getElementById('difficulty-select').value
+            difficulty: document.getElementById('difficulty-select').value,
+            imposterSeesCategory: document.getElementById('imposter-sees-category').value
         };
         db.ref('rooms/' + roomId + '/settings').set(settings);
     }
 
     function updateUIForHost() {
         if (CURRENT_MODE === 'offline') return;
-        const selects = ['imposter-count', 'category-select', 'difficulty-select'];
+        const selects = ['imposter-count', 'category-select', 'difficulty-select', 'imposter-sees-category'];
         const startBtn = document.getElementById('btn-start-game');
         const waitMsg = document.getElementById('waiting-msg');
         const statusText = document.getElementById('settings-status-text');
         
         const gameControls = document.getElementById('host-game-controls');
-        const voteControls = document.getElementById('host-voting-controls'); // Nuevo
+        const voteControls = document.getElementById('host-voting-controls'); 
         const scoreControls = document.getElementById('host-score-controls');
         const restartControls = document.getElementById('host-restart-controls');
         const clientWait = document.getElementById('client-wait-restart');
 
         if (isHost) {
-            selects.forEach(id => document.getElementById(id).disabled = false);
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.disabled = false;
+            });
             startBtn.style.display = 'block'; waitMsg.style.display = 'none'; statusText.innerText = "(Tú eres el anfitrión)";
             if(document.getElementById('game-screen').classList.contains('active')) gameControls.style.display = 'block';
             if(document.getElementById('voting-screen').classList.contains('active')) voteControls.style.display = 'block';
             if(document.getElementById('result-screen').classList.contains('active')) { scoreControls.style.display = 'block'; restartControls.style.display = 'block'; clientWait.style.display = 'none'; }
         } else {
-            selects.forEach(id => document.getElementById(id).disabled = true);
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.disabled = true;
+            });
             startBtn.style.display = 'none'; waitMsg.style.display = 'block'; statusText.innerText = "(Solo lectura)";
             gameControls.style.display = 'none'; voteControls.style.display = 'none'; scoreControls.style.display = 'none'; restartControls.style.display = 'none';
             if(document.getElementById('result-screen').classList.contains('active')) clientWait.style.display = 'block';
@@ -637,10 +665,16 @@
                 if (!firstPlayerId) firstPlayerId = p.id;
                 if (p.isHost) hostExists = true;
                 playersInRoom.push(p);
+            });
+            // SORTING ONLINE
+            playersInRoom.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            playersInRoom.forEach(p => {
                 const li = document.createElement('li'); li.className = 'lobby-player';
                 li.innerHTML = `<span>${p.isHost ? '<span class="host-badge">HOST</span>' : '👤'} ${p.name} ${p.id === myId ? '<span class="me-badge">TÚ</span>' : ''}</span> <span class="score-badge">${p.score || 0} pts</span>`;
                 list.appendChild(li);
             });
+
             if (!hostExists && playersInRoom.length > 0 && myId === firstPlayerId) {
                 db.ref('rooms/' + roomId + '/players/' + myId).update({ isHost: true }); isHost = true;
             }
@@ -654,6 +688,7 @@
                 document.getElementById('imposter-count').value = settings.imposterCount;
                 document.getElementById('category-select').value = settings.category;
                 document.getElementById('difficulty-select').value = settings.difficulty;
+                if(settings.imposterSeesCategory) document.getElementById('imposter-sees-category').value = settings.imposterSeesCategory;
             }
         });
 
@@ -664,11 +699,15 @@
 
             if (state.phase === 'assigned') {
                 if (state.roles && state.roles[myId]) {
-                    mySavedRoleData = { ...state.roles[myId], categoryName: state.categoryName };
+                    mySavedRoleData = { 
+                        ...state.roles[myId], 
+                        categoryName: state.categoryName,
+                        imposterSeesCategory: state.imposterSeesCategory 
+                    };
                     revealMyRole(mySavedRoleData);
                 } else {
                     document.getElementById('role-text').innerText = "Sincronizando...";
-                    setTimeout(() => {}, 500); // Retry delay
+                    setTimeout(() => {}, 500); 
                 }
             } else if (state.phase === 'playing') {
                 startLocalTimer(state.endTime, state.starterName);
@@ -682,79 +721,67 @@
         });
     }
 
+    // --- START GAME ONLINE ---
     function startGame() {
         if (!isHost) return;
         if (playersInRoom.length < 3) return alert("Se necesitan al menos 3 jugadores.");
+        
         const categoryKey = document.getElementById('category-select').value;
         const difficulty = document.getElementById('difficulty-select').value;
         const imposterSetting = document.getElementById('imposter-count').value;
-        startSharedGameLogic(playersInRoom, imposterSetting, categoryKey, difficulty);
-    }
+        const seesCategory = document.getElementById('imposter-sees-category').value === 'yes';
 
-    // --- VOTACIÓN ONLINE ---
-    function startVotingGlobal() {
-        db.ref('rooms/' + roomId + '/gameState').update({ phase: 'voting' });
-    }
+        // Validación 3 impostores (mínimo 4 jugadores)
+        if (imposterSetting === "3" && playersInRoom.length < 4) return alert("Para 3 impostores se necesitan al menos 4 jugadores.");
 
-    function showVotingScreen() {
-        clearInterval(timerInterval); // Parar el timer
-        switchScreen('voting-screen');
-        hasVoted = false;
-        document.getElementById('vote-status').innerText = "Toca un nombre para acusar:";
-        
-        const container = document.getElementById('voting-buttons-container');
-        container.innerHTML = "";
-
-        // Crear botones de votación para cada jugador
-        playersInRoom.forEach(p => {
-            // No puedes votarte a ti mismo (opcional, pero común)
-            if (p.id === myId) return;
-
-            const btn = document.createElement('button');
-            btn.className = 'vote-btn';
-            btn.innerHTML = `<span>👤 ${p.name}</span>`;
-            btn.onclick = () => castVote(p.id, btn);
-            container.appendChild(btn);
+        db.ref('rooms/' + roomId + '/usedWords').once('value', snapshot => {
+            const usedWords = snapshot.val() || [];
+            const selection = getUnusedWord(categoryKey, usedWords);
+            const secretItem = selection.item;
+            let newUsedWords = selection.reset ? [secretItem.word] : [...usedWords, secretItem.word];
+            
+            db.ref('rooms/' + roomId + '/usedWords').set(newUsedWords);
+            startSharedGameLogic(playersInRoom, imposterSetting, categoryKey, difficulty, secretItem, seesCategory);
         });
-        
-        updateUIForHost(); // Mostrar botón de forzar si soy host
     }
 
-    function castVote(targetId, btnElement) {
-        if (hasVoted) return;
-        hasVoted = true;
+    // --- START GAME OFFLINE ---
+    function startOfflineGame() {
+        if (offlinePlayers.length < 3) return alert("Mínimo 3 jugadores.");
         
-        // Efecto visual
-        const allBtns = document.querySelectorAll('.vote-btn');
-        allBtns.forEach(b => b.style.opacity = '0.5');
-        btnElement.style.opacity = '1';
-        btnElement.classList.add('selected');
-        
-        document.getElementById('vote-status').innerText = "Voto enviado. Esperando a los demás...";
+        const categoryKey = document.getElementById('offline-category-select').value;
+        const difficulty = document.getElementById('offline-difficulty-select').value;
+        const imposterSetting = document.getElementById('offline-imposter-count').value;
+        const seesCategory = document.getElementById('offline-imposter-sees-category').value === 'yes';
 
-        // Enviar a Firebase (votes/myId = targetId)
-        db.ref('rooms/' + roomId + '/gameState/votes/' + myId).set(targetId);
+        if (imposterSetting !== 'random' && offlinePlayers.length <= parseInt(imposterSetting)) return alert("Demasiados impostores.");
+        
+        // Validación 3 impostores offline
+        if (imposterSetting === "3" && offlinePlayers.length < 4) return alert("Para 3 impostores se necesitan al menos 4 jugadores.");
+
+        const selection = getUnusedWord(categoryKey, offlineUsedWords);
+        const secretItem = selection.item;
+        
+        if (selection.reset) offlineUsedWords = [secretItem.word];
+        else offlineUsedWords.push(secretItem.word);
+
+        const setup = calculateGameSetup(offlinePlayers, imposterSetting, categoryKey, difficulty, secretItem);
+        currentGameState = { ...setup, imposterSeesCategory: seesCategory };
+        currentOfflineIndex = 0;
+        showOfflinePassScreen();
     }
 
-    // --- LÓGICA COMPARTIDA ---
-    function calculateGameSetup(playersArray, imposterSetting, categoryKey, difficulty) {
-        let keys = Object.keys(database);
-        if (categoryKey !== 'random') keys = [categoryKey];
-        const chosenCat = keys[Math.floor(Math.random() * keys.length)];
-        const items = database[chosenCat];
-        const secretItem = items[Math.floor(Math.random() * items.length)];
-
-        // CALCULAR NÚMERO DE IMPOSTORES
+    function calculateGameSetup(playersArray, imposterSetting, categoryKey, difficulty, secretItem) {
         let imposterCount = 1;
         if (imposterSetting === 'random') {
-            // Si hay pocos jugadores (menos de 5), forzar 1 impostor
-            if (playersArray.length < 5) imposterCount = 1;
-            else imposterCount = Math.random() < 0.5 ? 1 : 2;
+            const count = playersArray.length;
+            if (count < 5) imposterCount = 1;
+            else if (count < 7) imposterCount = Math.floor(Math.random() * 2) + 1; // 1 or 2
+            else imposterCount = Math.floor(Math.random() * 3) + 1; // 1, 2 or 3
         } else {
             imposterCount = parseInt(imposterSetting);
         }
 
-        // Shuffle
         let indices = playersArray.map((_, i) => i);
         for (let i = indices.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -779,8 +806,18 @@
             };
         });
 
+        let catName = categoryKey.toUpperCase();
+        if (categoryKey === 'random') {
+             for (const [key, items] of Object.entries(database)) {
+                if (items.some(i => i.word === secretItem.word)) {
+                    catName = key.toUpperCase();
+                    break;
+                }
+            }
+        }
+
         return {
-            categoryName: chosenCat.toUpperCase(),
+            categoryName: catName,
             roles: rolesMap,
             impostorNames: impostorNames,
             secretWord: secretItem.word,
@@ -788,8 +825,8 @@
         };
     }
 
-    function startSharedGameLogic(players, imposterSetting, catKey, diff) {
-        const setup = calculateGameSetup(players, imposterSetting, catKey, diff);
+    function startSharedGameLogic(players, imposterSetting, catKey, diff, secretItem, seesCategory) {
+        const setup = calculateGameSetup(players, imposterSetting, catKey, diff, secretItem);
         db.ref('rooms/' + roomId + '/gameState').set({
             phase: 'assigned',
             categoryName: setup.categoryName,
@@ -797,7 +834,8 @@
             impostorNames: setup.impostorNames,
             secretWord: setup.secretWord,
             starterName: setup.starterName,
-            votes: {} // Reset votos
+            imposterSeesCategory: seesCategory,
+            votes: {} 
         });
     }
 
@@ -828,11 +866,25 @@
         const text = document.getElementById('role-text');
         const hint = document.getElementById('role-hint');
         card.classList.remove('imposter-reveal'); hint.style.display = 'none';
+        
         if (data.isImposter) {
-            card.classList.add('imposter-reveal'); text.innerText = "🕵️ IMPOSTOR";
-            if (data.showHint) { hint.style.display = 'block'; hint.innerText = "Pista: " + data.hint; }
-        } else { text.innerText = data.word; }
-        document.getElementById('category-display').innerText = "Categoría: " + data.categoryName;
+            card.classList.add('imposter-reveal'); 
+            text.innerText = "🕵️ IMPOSTOR";
+            if (data.showHint) { 
+                hint.style.display = 'block'; 
+                hint.innerText = "Pista: " + data.hint; 
+            }
+            
+            // Lógica de visualización de categoría
+            if (data.imposterSeesCategory) {
+                document.getElementById('category-display').innerText = "Categoría: " + data.categoryName;
+            } else {
+                document.getElementById('category-display').innerText = "Categoría: ❓"; 
+            }
+        } else { 
+            text.innerText = data.word; 
+            document.getElementById('category-display').innerText = "Categoría: " + data.categoryName;
+        }
     }
 
     function startLocalTimer(endTime, starterName) {
@@ -865,6 +917,41 @@
         }, 1000);
     }
 
+    function startVotingGlobal() {
+        db.ref('rooms/' + roomId + '/gameState').update({ phase: 'voting' });
+    }
+
+    function showVotingScreen() {
+        clearInterval(timerInterval);
+        switchScreen('voting-screen');
+        hasVoted = false;
+        document.getElementById('vote-status').innerText = "Toca un nombre para acusar:";
+        
+        const container = document.getElementById('voting-buttons-container');
+        container.innerHTML = "";
+
+        playersInRoom.forEach(p => {
+            if (p.id === myId) return; 
+            const btn = document.createElement('button');
+            btn.className = 'vote-btn';
+            btn.innerHTML = `<span>👤 ${p.name}</span>`;
+            btn.onclick = () => castVote(p.id, btn);
+            container.appendChild(btn);
+        });
+        updateUIForHost();
+    }
+
+    function castVote(targetId, btnElement) {
+        if (hasVoted) return;
+        hasVoted = true;
+        const allBtns = document.querySelectorAll('.vote-btn');
+        allBtns.forEach(b => b.style.opacity = '0.5');
+        btnElement.style.opacity = '1';
+        btnElement.classList.add('selected');
+        document.getElementById('vote-status').innerText = "Voto enviado. Esperando...";
+        db.ref('rooms/' + roomId + '/gameState/votes/' + myId).set(targetId);
+    }
+
     function endGameGlobal() {
         if (CURRENT_MODE === 'online') {
             db.ref('rooms/' + roomId + '/gameState').update({ phase: 'finished' });
@@ -879,42 +966,33 @@
         document.getElementById('result-impostors').innerText = state.impostorNames.join(" y ");
         document.getElementById('result-word').innerText = state.secretWord;
 
-        // Mostrar Resultados de Votación (Solo online)
         const voteBox = document.getElementById('voting-results-display');
         const votesList = document.getElementById('votes-list');
         
         if (CURRENT_MODE === 'online' && state.votes) {
             voteBox.style.display = 'block';
             votesList.innerHTML = "";
-            
-            // Contar votos
             let voteCounts = {};
-            Object.values(state.votes).forEach(targetId => {
-                voteCounts[targetId] = (voteCounts[targetId] || 0) + 1;
-            });
-
-            // Mostrar lista
+            Object.values(state.votes).forEach(targetId => { voteCounts[targetId] = (voteCounts[targetId] || 0) + 1; });
             for (let [targetId, count] of Object.entries(voteCounts)) {
-                // Buscar nombre del jugador
                 const p = playersInRoom.find(pl => pl.id === targetId);
                 const name = p ? p.name : "Desconocido";
                 const isImp = state.roles[targetId] && state.roles[targetId].isImposter;
-                
                 const li = document.createElement('li');
                 li.innerHTML = `<b>${name}</b>: ${count} votos ${isImp ? '😈' : '😇'}`;
                 votesList.appendChild(li);
             }
-        } else {
-            voteBox.style.display = 'none';
-        }
+        } else { voteBox.style.display = 'none'; }
 
         if (CURRENT_MODE === 'online') {
             updateUIForHost();
             document.getElementById('offline-restart-btn').style.display = 'none';
+            document.getElementById('offline-score-controls').style.display = 'none';
         } else {
             document.getElementById('host-score-controls').style.display = 'none';
             document.getElementById('host-restart-controls').style.display = 'none';
             document.getElementById('client-wait-restart').style.display = 'none';
+            document.getElementById('offline-score-controls').style.display = 'block';
             document.getElementById('offline-restart-btn').style.display = 'block';
         }
     }
@@ -924,9 +1002,9 @@
     
     function addOfflinePlayer() {
         const input = document.getElementById('offline-new-player');
-        const name = input.value.trim();
+        const name = escapeHtml(input.value.trim());
         if (name) {
-            offlinePlayers.push({ name: name, id: 'off-' + Date.now() + Math.random() });
+            offlinePlayers.push({ name: name, id: 'off-' + Date.now() + Math.random(), score: 0 });
             input.value = "";
             renderOfflineList();
         }
@@ -940,27 +1018,16 @@
     function renderOfflineList() {
         const list = document.getElementById('offline-player-list');
         list.innerHTML = "";
+        
+        // SORTING OFFLINE
+        offlinePlayers.sort((a, b) => (b.score || 0) - (a.score || 0));
+
         offlinePlayers.forEach((p, i) => {
             const li = document.createElement('li');
             li.className = 'player-item';
-            li.innerHTML = `<span>👤 ${p.name}</span><button class="delete-btn" onclick="removeOfflinePlayer(${i})">✕</button>`;
+            li.innerHTML = `<span>👤 ${p.name} <span class="score-badge">${p.score} pts</span></span><button class="delete-btn" onclick="removeOfflinePlayer(${i})">✕</button>`;
             list.appendChild(li);
         });
-    }
-
-    function startOfflineGame() {
-        if (offlinePlayers.length < 3) return alert("Mínimo 3 jugadores.");
-        const imposterSetting = document.getElementById('offline-imposter-count').value;
-        // Validación offline simple para impostores fijos
-        if (imposterSetting !== 'random' && offlinePlayers.length <= parseInt(imposterSetting)) return alert("Demasiados impostores.");
-        
-        const categoryKey = document.getElementById('offline-category-select').value;
-        const difficulty = document.getElementById('offline-difficulty-select').value;
-
-        const setup = calculateGameSetup(offlinePlayers, imposterSetting, categoryKey, difficulty);
-        currentGameState = setup;
-        currentOfflineIndex = 0;
-        showOfflinePassScreen();
     }
 
     function showOfflinePassScreen() {
@@ -973,7 +1040,11 @@
     function showOfflineRole() {
         const p = offlinePlayers[currentOfflineIndex];
         const roleData = currentGameState.roles[p.id];
-        mySavedRoleData = { ...roleData, categoryName: currentGameState.categoryName }; 
+        mySavedRoleData = { 
+            ...roleData, 
+            categoryName: currentGameState.categoryName,
+            imposterSeesCategory: currentGameState.imposterSeesCategory
+        }; 
         revealMyRole(mySavedRoleData);
     }
 
@@ -986,6 +1057,16 @@
         }
     }
 
+    function distributeOfflinePoints(winnerType) {
+        offlinePlayers.forEach(p => {
+            const role = currentGameState.roles[p.id];
+            if (winnerType === 'civilians' && !role.isImposter) p.score += 1;
+            if (winnerType === 'impostors' && role.isImposter) p.score += 3;
+        });
+        renderOfflineList();
+        resetOfflineGame();
+    }
+
     function resetOfflineGame() { switchScreen('offline-setup-screen'); }
 
     // Helpers
@@ -995,11 +1076,20 @@
         const text = document.getElementById('review-role-text');
         const hint = document.getElementById('review-role-hint');
         card.classList.remove('imposter-reveal'); hint.style.display = 'none';
+        
         if (mySavedRoleData.isImposter) {
             card.classList.add('imposter-reveal'); text.innerText = "🕵️ IMPOSTOR";
             if (mySavedRoleData.showHint) { hint.style.display = 'block'; hint.innerText = "Pista: " + mySavedRoleData.hint; }
-        } else { text.innerText = mySavedRoleData.word; }
-        document.getElementById('review-category-display').innerText = "Categoría: " + mySavedRoleData.categoryName;
+            
+            if (mySavedRoleData.imposterSeesCategory) {
+                document.getElementById('review-category-display').innerText = "Categoría: " + mySavedRoleData.categoryName;
+            } else {
+                document.getElementById('review-category-display').innerText = "Categoría: ❓";
+            }
+        } else { 
+            text.innerText = mySavedRoleData.word; 
+            document.getElementById('review-category-display').innerText = "Categoría: " + mySavedRoleData.categoryName;
+        }
         document.getElementById('review-overlay').style.display = 'flex';
     }
     function closeRoleReview() { document.getElementById('review-overlay').style.display = 'none'; }
