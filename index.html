@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego del Impostor</title>
+    <title>Juego del Impostor - Base de Datos Ampliada</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
@@ -95,15 +95,7 @@
             display: none; font-weight: bold; text-align: center;
         }
         
-        .theme-switch-wrapper { 
-            position: absolute; 
-            top: 10px; 
-            left: 30px; 
-            display: flex; 
-            align-items: center; 
-            z-index: 10; 
-        }
-
+        .theme-switch-wrapper { position: absolute; top: 10px; left: 30px; display: flex; align-items: center; z-index: 10; }
         .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
         .theme-switch input { display: none; }
         .slider { background-color: rgba(0,0,0,0.3); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 14px; }
@@ -151,12 +143,12 @@
         .mode-subtext { font-size: 0.8rem; font-weight: normal; opacity: 0.8; }
 
         #player-list-lobby, #offline-player-list { list-style: none; padding: 0; margin: 10px 0; max-height: 20vh; overflow-y: auto; scrollbar-width: thin; }
-        .lobby-player, .player-item { background: var(--input-bg); padding: 10px; margin: 5px 0; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
+        .lobby-player, .player-item { background: var(--input-bg); padding: 10px; margin: 5px 0; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); transition: all 0.3s; }
         .delete-btn { background: #ff7675; border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; box-shadow: none; }
 
         .me-badge { font-size: 0.7rem; background: var(--success-color); padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-left: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         .host-badge { font-size: 0.7rem; background: #f1c40f; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-right: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .score-badge { font-size: 0.9rem; font-weight: bold; color: var(--accent-color); background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; }
+        .score-badge { font-size: 0.9rem; font-weight: bold; color: var(--accent-color); background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; min-width: 30px; text-align: center; }
 
         .role-card { 
             background: var(--input-bg); color: var(--text-main); padding: 30px 20px; border-radius: 20px; margin: 20px 0; 
@@ -189,6 +181,8 @@
         .score-btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .score-btn-civ { background-color: var(--btn-color); font-size: 0.9rem; }
         .score-btn-imp { background-color: var(--danger-color); font-size: 0.9rem; margin-top: 0;}
+        .seo-content { margin-top: 30px; text-align: left; font-size: 0.85rem; opacity: 0.8; border-top: 1px solid var(--glass-border); padding-top: 15px; line-height: 1.4; }
+        .seo-content h2 { font-size: 1rem; color: var(--accent-color); margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -217,6 +211,11 @@
             🌐 Jugar Online
             <span class="mode-subtext">Cada uno en su casa</span>
         </button>
+        <div class="seo-content">
+            <h2>¿Cómo jugar al Impostor?</h2>
+            <p>El Impostor es un juego de deducción social. Todos reciben una palabra secreta menos los impostores.</p>
+            <p>Descubre quién miente haciendo preguntas, o intenta pasar desapercibido si eres el impostor.</p>
+        </div>
     </div>
 
     <div id="online-home-screen" class="screen">
@@ -417,7 +416,7 @@
 
 <script>
     // ---------------------------------------------------------
-    // TU CONFIGURACIÓN DE FIREBASE (YA INSERTADA)
+    // FIREBASE
     // ---------------------------------------------------------
     const firebaseConfig = {
         apiKey: "AIzaSyCD9EZAZldGoBHv5-v9jQ8wfOSVPL9mu60",
@@ -435,12 +434,7 @@
 
     function escapeHtml(text) {
         if (!text) return "";
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     const connectedRef = db.ref(".info/connected");
@@ -466,8 +460,7 @@
     let currentGameState = null;
     let hasVoted = false;
 
-    // --- BASE DE DATOS DE PALABRAS ---
-    // Actualizada con 4 niveles de dificultad: easy, medium, hard, very_hard
+    // --- BASE DE DATOS MASIVA ---
     const database = {
         lugares: [
             { word: "Playa", hints: { easy: "Arena", medium: "Sal", hard: "Marea", very_hard: "Litoral" } },
@@ -476,7 +469,26 @@
             { word: "Cine", hints: { easy: "Palomitas", medium: "Butaca", hard: "Estreno", very_hard: "Proyector" } },
             { word: "Supermercado", hints: { easy: "Carrito", medium: "Pasillo", hard: "Bolsa", very_hard: "Góndola" } },
             { word: "Avión", hints: { easy: "Nubes", medium: "Maleta", hard: "Pasaporte", very_hard: "Presurización" } },
-            { word: "Zoológico", hints: { easy: "Jaula", medium: "Safari", hard: "Domingo", very_hard: "Cautiverio" } }
+            { word: "Zoológico", hints: { easy: "Jaula", medium: "Safari", hard: "Domingo", very_hard: "Cautiverio" } },
+            { word: "Biblioteca", hints: { easy: "Silencio", medium: "Préstamo", hard: "Estantería", very_hard: "Catalogación" } },
+            { word: "Restaurante", hints: { easy: "Menú", medium: "Propina", hard: "Reserva", very_hard: "Mise en place" } },
+            { word: "Gimnasio", hints: { easy: "Pesas", medium: "Sudor", hard: "Mancuerna", very_hard: "Hipertrofia" } },
+            { word: "Iglesia", hints: { easy: "Rezar", medium: "Domingo", hard: "Altar", very_hard: "Eucaristía" } },
+            { word: "Parque", hints: { easy: "Columpio", medium: "Banco", hard: "Paseo", very_hard: "Esparcimiento" } },
+            { word: "Banco", hints: { easy: "Dinero", medium: "Cajero", hard: "Hipoteca", very_hard: "Interés" } },
+            { word: "Hotel", hints: { easy: "Cama", medium: "Recepción", hard: "Estrellas", very_hard: "Check-in" } },
+            { word: "Cárcel", hints: { easy: "Rejas", medium: "Naranja", hard: "Celda", very_hard: "Penitenciaría" } },
+            { word: "Cementerio", hints: { easy: "Tumba", medium: "Flores", hard: "Lápida", very_hard: "Camposanto" } },
+            { word: "Museo", hints: { easy: "Arte", medium: "Cuadro", hard: "Guía", very_hard: "Curador" } },
+            { word: "Farmacia", hints: { easy: "Cruz", medium: "Receta", hard: "Jarabe", very_hard: "Boticario" } },
+            { word: "Estadio", hints: { easy: "Grada", medium: "Césped", hard: "Afición", very_hard: "Aforo" } },
+            { word: "Circo", hints: { easy: "Carpa", medium: "Payaso", hard: "Trapecio", very_hard: "Itinerante" } },
+            { word: "Discoteca", hints: { easy: "Música", medium: "Luces", hard: "Copas", very_hard: "Pista" } },
+            { word: "Montaña", hints: { easy: "Nieve", medium: "Altura", hard: "Cima", very_hard: "Alpinismo" } },
+            { word: "Desierto", hints: { easy: "Calor", medium: "Arena", hard: "Cactus", very_hard: "Oasis" } },
+            { word: "Bosque", hints: { easy: "Árboles", medium: "Verde", hard: "Sombra", very_hard: "Espesura" } },
+            { word: "Espacio", hints: { easy: "Estrellas", medium: "Vacío", hard: "Gravedad", very_hard: "Cosmos" } },
+            { word: "Submarino", hints: { easy: "Agua", medium: "Profundo", hard: "Periscopio", very_hard: "Inmersión" } }
         ],
         comida: [
             { word: "Pizza", hints: { easy: "Italia", medium: "Caja", hard: "Triángulo", very_hard: "Fermentación" } },
@@ -484,7 +496,26 @@
             { word: "Hamburguesa", hints: { easy: "Pan", medium: "Ketchup", hard: "Rápida", very_hard: "Sésamo" } },
             { word: "Helado", hints: { easy: "Verano", medium: "Derrite", hard: "Cuchara", very_hard: "Cremosidad" } },
             { word: "Chocolate", hints: { easy: "Suiza", medium: "Tableta", hard: "Amargo", very_hard: "Temperado" } },
-            { word: "Ensalada", hints: { easy: "Dieta", medium: "Aceite", hard: "Mezclar", very_hard: "Aliño" } }
+            { word: "Ensalada", hints: { easy: "Dieta", medium: "Aceite", hard: "Mezclar", very_hard: "Aliño" } },
+            { word: "Tacos", hints: { easy: "México", medium: "Tortilla", hard: "Picante", very_hard: "Pastor" } },
+            { word: "Paella", hints: { easy: "Arroz", medium: "Domingo", hard: "Azafrán", very_hard: "Socarrat" } },
+            { word: "Espaguetis", hints: { easy: "Largo", medium: "Tomate", hard: "Tenedor", very_hard: "Al dente" } },
+            { word: "Sopa", hints: { easy: "Cuchara", medium: "Caliente", hard: "Fideos", very_hard: "Caldo" } },
+            { word: "Pollo frito", hints: { easy: "Crujiente", medium: "Grasa", hard: "Cubo", very_hard: "Rebozado" } },
+            { word: "Huevo frito", hints: { easy: "Desayuno", medium: "Yema", hard: "Sartén", very_hard: "Clara" } },
+            { word: "Pan", hints: { easy: "Miga", medium: "Horno", hard: "Corteza", very_hard: "Levadura" } },
+            { word: "Queso", hints: { easy: "Ratón", medium: "Leche", hard: "Agujeros", very_hard: "Curación" } },
+            { word: "Manzana", hints: { easy: "Roja", medium: "Fruta", hard: "Blancanieves", very_hard: "Sidra" } },
+            { word: "Plátano", hints: { easy: "Amarillo", medium: "Mono", hard: "Potasio", very_hard: "Canarias" } },
+            { word: "Sandía", hints: { easy: "Verde", medium: "Roja", hard: "Pepitas", very_hard: "Hidratación" } },
+            { word: "Pastel", hints: { easy: "Cumpleaños", medium: "Velas", hard: "Dulce", very_hard: "Reposteria" } },
+            { word: "Donut", hints: { easy: "Agujero", medium: "Policía", hard: "Glaseado", very_hard: "Rosquilla" } },
+            { word: "Café", hints: { easy: "Mañana", medium: "Negro", hard: "Cafeína", very_hard: "Tueste" } },
+            { word: "Cerveza", hints: { easy: "Espuma", medium: "Rubia", hard: "Cebada", very_hard: "Lúpulo" } },
+            { word: "Vino", hints: { easy: "Copa", medium: "Uva", hard: "Tinto", very_hard: "Taninos" } },
+            { word: "Agua", hints: { easy: "Sed", medium: "Transparente", hard: "Grifo", very_hard: "H2O" } },
+            { word: "Kebab", hints: { easy: "Rollo", medium: "Carne", hard: "Salsa", very_hard: "Giratorio" } },
+            { word: "Perrito caliente", hints: { easy: "Salchicha", medium: "Pan", hard: "Mostaza", very_hard: "Frankfurt" } }
         ],
         animales: [
             { word: "Perro", hints: { easy: "Amigo", medium: "Hueso", hard: "Correa", very_hard: "Olfato" } },
@@ -492,22 +523,106 @@
             { word: "León", hints: { easy: "Selva", medium: "Melena", hard: "Rugido", very_hard: "Depredador" } },
             { word: "Elefante", hints: { easy: "Circo", medium: "Maní", hard: "Pesado", very_hard: "Paquidermo" } },
             { word: "Tiburón", hints: { easy: "Sangre", medium: "Terror", hard: "Surfista", very_hard: "Cartílago" } },
-            { word: "Pingüino", hints: { easy: "Traje", medium: "Huevo", hard: "Baile", very_hard: "Antártida" } }
+            { word: "Pingüino", hints: { easy: "Traje", medium: "Huevo", hard: "Baile", very_hard: "Antártida" } },
+            { word: "Jirafa", hints: { easy: "Cuello", medium: "Alta", hard: "Manchas", very_hard: "Sabana" } },
+            { word: "Mono", hints: { easy: "Banana", medium: "Árbol", hard: "Cola", very_hard: "Primate" } },
+            { word: "Serpiente", hints: { easy: "Suelo", medium: "Veneno", hard: "Escamas", very_hard: "Reptil" } },
+            { word: "Águila", hints: { easy: "Volar", medium: "Pico", hard: "Garra", very_hard: "Rapaz" } },
+            { word: "Delfín", hints: { easy: "Mar", medium: "Salto", hard: "Inteligente", very_hard: "Ecolocalización" } },
+            { word: "Ballena", hints: { easy: "Grande", medium: "Océano", hard: "Chorro", very_hard: "Cetáceo" } },
+            { word: "Cocodrilo", hints: { easy: "Dientes", medium: "Pantano", hard: "Verde", very_hard: "Saurio" } },
+            { word: "Tortuga", hints: { easy: "Lenta", medium: "Caparazón", hard: "Lechuga", very_hard: "Longeva" } },
+            { word: "Oso", hints: { easy: "Miel", medium: "Hibernar", hard: "Pelo", very_hard: "Plantígrado" } },
+            { word: "Caballo", hints: { easy: "Montar", medium: "Carrera", hard: "Relincho", very_hard: "Equino" } },
+            { word: "Vaca", hints: { easy: "Leche", medium: "Granja", hard: "Pasto", very_hard: "Rumiante" } },
+            { word: "Cerdo", hints: { easy: "Rosa", medium: "Jamón", hard: "Barro", very_hard: "Porcino" } },
+            { word: "Gallina", hints: { easy: "Huevo", medium: "Plumas", hard: "Corral", very_hard: "Ave" } },
+            { word: "Abeja", hints: { easy: "Miel", medium: "Flor", hard: "Amarillo", very_hard: "Polinización" } },
+            { word: "Araña", hints: { easy: "Tela", medium: "Ocho", hard: "Miedo", very_hard: "Arácnido" } },
+            { word: "Hormiga", hints: { easy: "Pequeña", medium: "Fila", hard: "Trabajo", very_hard: "Colonia" } },
+            { word: "Mariposa", hints: { easy: "Alas", medium: "Colores", hard: "Gusano", very_hard: "Metamorfosis" } },
+            { word: "Lobo", hints: { easy: "Luna", medium: "Aullar", hard: "Cuento", very_hard: "Manada" } },
+            { word: "Tigre", hints: { easy: "Rayas", medium: "Naranja", hard: "Gato", very_hard: "Felino" } }
+        ],
+        profesiones: [
+            { word: "Médico", hints: { easy: "Hospital", medium: "Curar", hard: "Bata", very_hard: "Estetoscopio" } },
+            { word: "Bombero", hints: { easy: "Fuego", medium: "Camión", hard: "Manguera", very_hard: "Sirena" } },
+            { word: "Policía", hints: { easy: "Ladrón", medium: "Pistola", hard: "Esposas", very_hard: "Ley" } },
+            { word: "Profesor", hints: { easy: "Escuela", medium: "Enseñar", hard: "Pizarra", very_hard: "Examen" } },
+            { word: "Cocinero", hints: { easy: "Comida", medium: "Restaurante", hard: "Gorro", very_hard: "Receta" } },
+            { word: "Astronauta", hints: { easy: "Espacio", medium: "Cohete", hard: "Casco", very_hard: "Gravedad" } },
+            { word: "Pintor", hints: { easy: "Cuadro", medium: "Brocha", hard: "Color", very_hard: "Lienzo" } },
+            { word: "Cantante", hints: { easy: "Música", medium: "Micrófono", hard: "Voz", very_hard: "Concierto" } },
+            { word: "Futbolista", hints: { easy: "Balón", medium: "Gol", hard: "Campo", very_hard: "Liga" } },
+            { word: "Juez", hints: { easy: "Mazo", medium: "Juicio", hard: "Justicia", very_hard: "Toga" } },
+            { word: "Mecánico", hints: { easy: "Coche", medium: "Taller", hard: "Grasa", very_hard: "Motor" } },
+            { word: "Peluquero", hints: { easy: "Pelo", medium: "Tijeras", hard: "Peine", very_hard: "Secador" } },
+            { word: "Jardinero", hints: { easy: "Plantas", medium: "Flores", hard: "Tierra", very_hard: "Poda" } },
+            { word: "Payaso", hints: { easy: "Circo", medium: "Risa", hard: "Nariz", very_hard: "Maquillaje" } },
+            { word: "Mago", hints: { easy: "Truco", medium: "Conejo", hard: "Chistera", very_hard: "Ilusión" } },
+            { word: "Presidente", hints: { easy: "País", medium: "Votos", hard: "Gobierno", very_hard: "Mandato" } },
+            { word: "Detective", hints: { easy: "Lupa", medium: "Misterio", hard: "Pista", very_hard: "Crimen" } },
+            { word: "Carpintero", hints: { easy: "Madera", medium: "Mesa", hard: "Martillo", very_hard: "Serrín" } }
         ],
         deportes: [
             { word: "Fútbol", hints: { easy: "Gol", medium: "Once", hard: "Portería", very_hard: "Estrategia" } },
             { word: "Baloncesto", hints: { easy: "Alto", medium: "Naranja", hard: "NBA", very_hard: "Tablero" } },
-            { word: "Tenis", hints: { easy: "Red", medium: "Wimbledon", hard: "Ventaja", very_hard: "Deuce" } }
+            { word: "Tenis", hints: { easy: "Red", medium: "Wimbledon", hard: "Ventaja", very_hard: "Deuce" } },
+            { word: "Natación", hints: { easy: "Agua", medium: "Piscina", hard: "Bañador", very_hard: "Crol" } },
+            { word: "Voleibol", hints: { easy: "Playa", medium: "Red", hard: "Mano", very_hard: "Remate" } },
+            { word: "Golf", hints: { easy: "Hoyo", medium: "Palo", hard: "Caddy", very_hard: "Swing" } },
+            { word: "Boxeo", hints: { easy: "Ring", medium: "Guantes", hard: "Puño", very_hard: "KO" } },
+            { word: "Esquí", hints: { easy: "Nieve", medium: "Montaña", hard: "Bastones", very_hard: "Descenso" } },
+            { word: "Surf", hints: { easy: "Ola", medium: "Tabla", hard: "Playa", very_hard: "Equilibrio" } },
+            { word: "Ciclismo", hints: { easy: "Bici", medium: "Rueda", hard: "Casco", very_hard: "Pelotón" } },
+            { word: "Atletismo", hints: { easy: "Correr", medium: "Pista", hard: "Salto", very_hard: "Juegos" } },
+            { word: "Rugby", hints: { easy: "Melé", medium: "Ovalo", hard: "Placaje", very_hard: "Ensayo" } },
+            { word: "Béisbol", hints: { easy: "Bate", medium: "Home", hard: "Gorra", very_hard: "Pitcher" } },
+            { word: "Karate", hints: { easy: "Cinturón", medium: "Kimono", hard: "Golpe", very_hard: "Dojo" } },
+            { word: "Fórmula 1", hints: { easy: "Coche", medium: "Rápido", hard: "Circuito", very_hard: "Boxes" } },
+            { word: "Ajedrez", hints: { easy: "Tablero", medium: "Rey", hard: "Jaque", very_hard: "Estrategia" } },
+            { word: "Pesca", hints: { easy: "Caña", medium: "Pez", hard: "Anzuelo", very_hard: "Paciencia" } },
+            { word: "Escalada", hints: { easy: "Roca", medium: "Subir", hard: "Cuerda", very_hard: "Arnés" } }
         ],
         instrumentos: [
             { word: "Guitarra", hints: { easy: "Cuerdas", medium: "Púa", hard: "Traste", very_hard: "Resonancia" } },
             { word: "Piano", hints: { easy: "Teclas", medium: "Cola", hard: "Pedal", very_hard: "Armonía" } },
-            { word: "Batería", hints: { easy: "Ritmo", medium: "Platillos", hard: "Ruido", very_hard: "Bombo" } }
+            { word: "Batería", hints: { easy: "Ritmo", medium: "Platillos", hard: "Ruido", very_hard: "Bombo" } },
+            { word: "Violín", hints: { easy: "Arco", medium: "Hombro", hard: "Pequeño", very_hard: "Orquesta" } },
+            { word: "Trompeta", hints: { easy: "Viento", medium: "Dorado", hard: "Soplido", very_hard: "Jazz" } },
+            { word: "Saxofón", hints: { easy: "Curvo", medium: "Jazz", hard: "Metal", very_hard: "Lisa" } },
+            { word: "Flauta", hints: { easy: "Larga", medium: "Agujeros", hard: "Dulce", very_hard: "Soplo" } },
+            { word: "Arpa", hints: { easy: "Ángel", medium: "Grande", hard: "Dedos", very_hard: "Cuerdas" } },
+            { word: "Maracas", hints: { easy: "Agitar", medium: "Pareja", hard: "Ritmo", very_hard: "Percusión" } },
+            { word: "Acordeón", hints: { easy: "Fuelle", medium: "Pecho", hard: "Teclas", very_hard: "Aire" } },
+            { word: "Clarinete", hints: { easy: "Negro", medium: "Madera", hard: "Calamardo", very_hard: "Boquilla" } },
+            { word: "Banjo", hints: { easy: "Country", medium: "Redondo", hard: "Cuerdas", very_hard: "Folk" } },
+            { word: "Ukelele", hints: { easy: "Pequeño", medium: "Hawai", hard: "Cuatro", very_hard: "Guitarrita" } },
+            { word: "Trombón", hints: { easy: "Vara", medium: "Largo", hard: "Metal", very_hard: "Grave" } },
+            { word: "Tambor", hints: { easy: "Golpe", medium: "Redoble", hard: "Palillos", very_hard: "Membrana" } },
+            { word: "Xilófono", hints: { easy: "Colores", medium: "Placas", hard: "Madera", very_hard: "Mazzas" } },
+            { word: "Gaita", hints: { easy: "Escocia", medium: "Bolsa", hard: "Falda", very_hard: "Soplido" } }
         ],
         ropa: [
             { word: "Camiseta", hints: { easy: "Algodón", medium: "Manga", hard: "Cuello", very_hard: "Textil" } },
             { word: "Pantalón", hints: { easy: "Piernas", medium: "Cinturón", hard: "Bolsillos", very_hard: "Dobladillo" } },
-            { word: "Zapatos", hints: { easy: "Suela", medium: "Cordones", hard: "Caminar", very_hard: "Empeine" } }
+            { word: "Zapatos", hints: { easy: "Suela", medium: "Cordones", hard: "Caminar", very_hard: "Empeine" } },
+            { word: "Vestido", hints: { easy: "Mujer", medium: "Fiesta", hard: "Largo", very_hard: "Elegancia" } },
+            { word: "Falda", hints: { easy: "Piernas", medium: "Vuelo", hard: "Escocesa", very_hard: "Minifalda" } },
+            { word: "Chaqueta", hints: { easy: "Frío", medium: "Cierre", hard: "Abrir", very_hard: "Americana" } },
+            { word: "Abrigo", hints: { easy: "Invierno", medium: "Largo", hard: "Calor", very_hard: "Lana" } },
+            { word: "Sombrero", hints: { easy: "Cabeza", medium: "Sol", hard: "Ala", very_hard: "Copa" } },
+            { word: "Guantes", hints: { easy: "Manos", medium: "Dedos", hard: "Nieve", very_hard: "Lana" } },
+            { word: "Bufanda", hints: { easy: "Cuello", medium: "Larga", hard: "Nudo", very_hard: "Garganta" } },
+            { word: "Calcetines", hints: { easy: "Pies", medium: "Pares", hard: "Olor", very_hard: "Algodón" } },
+            { word: "Ropa interior", hints: { easy: "Debajo", medium: "Íntimo", hard: "Oculto", very_hard: "Lencería" } },
+            { word: "Bañador", hints: { easy: "Agua", medium: "Playa", hard: "Verano", very_hard: "Piscina" } },
+            { word: "Corbata", hints: { easy: "Cuello", medium: "Nudo", hard: "Traje", very_hard: "Formal" } },
+            { word: "Cinturón", hints: { easy: "Cintura", medium: "Hebilla", hard: "Cuero", very_hard: "Sujetar" } },
+            { word: "Pijama", hints: { easy: "Dormir", medium: "Cama", hard: "Noche", very_hard: "Comodidad" } },
+            { word: "Gorra", hints: { easy: "Cabeza", medium: "Visera", hard: "Deporte", very_hard: "Sol" } },
+            { word: "Tacones", hints: { easy: "Alto", medium: "Ruido", hard: "Elegante", very_hard: "Equilibrio" } },
+            { word: "Botas", hints: { easy: "Lluvia", medium: "Fuertes", hard: "Militares", very_hard: "Tobillo" } }
         ]
     };
 
@@ -580,7 +695,7 @@
         if (!name) return alert("Escribe tu nombre.");
         myName = name; isHost = true;
         roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const initialSettings = { imposterCount: "random", category: "random", difficulty: "medium" };
+        const initialSettings = { imposterCount: "random", category: "random", difficulty: "medium", imposterSeesCategory: "no" };
         db.ref('rooms/' + roomId).set({ status: 'lobby', settings: initialSettings, usedWords: [], createdAt: firebase.database.ServerValue.TIMESTAMP }).then(() => { joinGameLogic(); });
     }
 
