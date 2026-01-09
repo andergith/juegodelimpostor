@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego del Impostor - Ultimate Fixed</title>
+    <title>Juego del Impostor - Voting Fix</title>
     
     <!-- --- 🔴 SECCIÓN DE LOGO E IMAGEN COMPARTIDA --- -->
     <link rel="icon" type="image/png" href="logo.png">
@@ -97,15 +97,7 @@
             display: none; font-weight: bold; text-align: center;
         }
         
-        .theme-switch-wrapper { 
-            position: absolute; 
-            top: 10px; 
-            left: 30px; 
-            display: flex; 
-            align-items: center; 
-            z-index: 10; 
-        }
-
+        .theme-switch-wrapper { position: absolute; top: 10px; left: 30px; display: flex; align-items: center; z-index: 10; }
         .theme-switch { display: inline-block; height: 26px; position: relative; width: 50px; }
         .theme-switch input { display: none; }
         .slider { background-color: rgba(0,0,0,0.3); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 14px; }
@@ -147,14 +139,15 @@
         button.whatsapp-btn { background-color: var(--whatsapp-color); font-size: 0.9rem; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         button.reset-score-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--text-secondary); font-size: 0.7rem; padding: 5px; margin-top: 10px; width: auto; }
 
-        .vote-btn { background-color: var(--input-bg); border: 1px solid var(--glass-border); text-align: left; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .vote-btn { background-color: var(--input-bg); border: 1px solid var(--glass-border); text-align: left; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
         .vote-btn.selected { background-color: var(--accent-color); border-color: var(--accent-color); }
+        .vote-btn.disabled { opacity: 0.5; pointer-events: none; }
 
         .mode-btn { padding: 25px; font-size: 1.3rem; margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .mode-subtext { font-size: 0.8rem; font-weight: normal; opacity: 0.8; }
 
         #player-list-lobby, #offline-player-list { list-style: none; padding: 0; margin: 10px 0; max-height: 20vh; overflow-y: auto; scrollbar-width: thin; }
-        .lobby-player, .player-item { background: var(--input-bg); padding: 10px; margin: 5px 0; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); transition: all 0.3s; }
+        .lobby-player, .player-item { background: var(--input-bg); padding: 10px; margin: 5px 0; border-radius: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
         .delete-btn { background: #ff7675; border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; box-shadow: none; }
 
         .me-badge { font-size: 0.7rem; background: var(--success-color); padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; margin-left: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
@@ -282,6 +275,13 @@
                 <option value="no">🙈 Impostor NO ve Categoría</option>
                 <option value="yes">👁️ Impostor SÍ ve Categoría</option>
             </select>
+            <select id="offline-timer-select">
+                <option value="60">⏱️ 1 Minuto</option>
+                <option value="120">⏱️ 2 Minutos</option>
+                <option value="180" selected>⏱️ 3 Minutos</option>
+                <option value="300">⏱️ 5 Minutos</option>
+                <option value="600">⏱️ 10 Minutos</option>
+            </select>
             <button onclick="startOfflineGame()" class="btn-start-margin">Empezar Partida</button>
         </div>
     </div>
@@ -332,6 +332,13 @@
             <select id="imposter-sees-category" onchange="syncSettings()">
                 <option value="no">🙈 Impostor NO ve Categoría</option>
                 <option value="yes">👁️ Impostor SÍ ve Categoría</option>
+            </select>
+            <select id="online-timer-select" onchange="syncSettings()">
+                <option value="60">⏱️ 1 Minuto</option>
+                <option value="120">⏱️ 2 Minutos</option>
+                <option value="180" selected>⏱️ 3 Minutos</option>
+                <option value="300">⏱️ 5 Minutos</option>
+                <option value="600">⏱️ 10 Minutos</option>
             </select>
 
             <!-- Botón de Resetear Puntos (Solo para Host) -->
@@ -461,29 +468,14 @@
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.database();
 
-    // --- SONIDO (WEB AUDIO API) ---
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(frequency = 440, duration = 200, type = 'sine') {
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.value = frequency;
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration/1000);
-        setTimeout(() => osc.stop(), duration);
-    }
-
-    // --- VIBRACIÓN ---
-    function vibrateDevice(ms) {
-        if (navigator.vibrate) navigator.vibrate(ms);
-    }
-
     function escapeHtml(text) {
         if (!text) return "";
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     const connectedRef = db.ref(".info/connected");
@@ -509,7 +501,7 @@
     let currentGameState = null;
     let hasVoted = false;
 
-    // --- BASE DE DATOS MASIVA (150+ Palabras) ---
+    // --- BASE DE DATOS DE PALABRAS ---
     const database = {
         lugares: [
             { word: "Playa", hints: { easy: "Arena", medium: "Sal", hard: "Marea", very_hard: "Litoral" } },
@@ -758,7 +750,7 @@
         if (!name) return alert("Escribe tu nombre.");
         myName = name; isHost = true;
         roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const initialSettings = { imposterCount: "random", category: "random", difficulty: "medium", imposterSeesCategory: "no" };
+        const initialSettings = { imposterCount: "random", category: "random", difficulty: "medium", imposterSeesCategory: "no", gameDuration: "180" };
         db.ref('rooms/' + roomId).set({ status: 'lobby', settings: initialSettings, usedWords: [], createdAt: firebase.database.ServerValue.TIMESTAMP }).then(() => { joinGameLogic(); });
     }
 
@@ -794,14 +786,15 @@
             imposterCount: document.getElementById('imposter-count').value,
             category: document.getElementById('category-select').value,
             difficulty: document.getElementById('difficulty-select').value,
-            imposterSeesCategory: document.getElementById('imposter-sees-category').value
+            imposterSeesCategory: document.getElementById('imposter-sees-category').value,
+            gameDuration: document.getElementById('online-timer-select').value
         };
         db.ref('rooms/' + roomId + '/settings').set(settings);
     }
 
     function updateUIForHost() {
         if (CURRENT_MODE === 'offline') return;
-        const selects = ['imposter-count', 'category-select', 'difficulty-select', 'imposter-sees-category'];
+        const selects = ['imposter-count', 'category-select', 'difficulty-select', 'imposter-sees-category', 'online-timer-select'];
         const startBtn = document.getElementById('btn-start-game');
         const waitMsg = document.getElementById('waiting-msg');
         const statusText = document.getElementById('settings-status-text');
@@ -812,7 +805,7 @@
         const restartControls = document.getElementById('host-restart-controls');
         const clientWait = document.getElementById('client-wait-restart');
         
-        const resetScoresBtn = document.getElementById('btn-reset-scores'); // Nuevo botón de reset
+        const resetScoresBtn = document.getElementById('btn-reset-scores'); 
 
         if (isHost) {
             selects.forEach(id => {
@@ -820,7 +813,7 @@
                 if(el) el.disabled = false;
             });
             startBtn.style.display = 'block'; waitMsg.style.display = 'none'; statusText.innerText = "(Tú eres el anfitrión)";
-            resetScoresBtn.style.display = 'inline-block'; // Solo Host ve el reset
+            resetScoresBtn.style.display = 'inline-block';
 
             if(document.getElementById('game-screen').classList.contains('active')) gameControls.style.display = 'block';
             if(document.getElementById('voting-screen').classList.contains('active')) voteControls.style.display = 'block';
@@ -888,6 +881,7 @@
                 document.getElementById('category-select').value = settings.category;
                 document.getElementById('difficulty-select').value = settings.difficulty;
                 if(settings.imposterSeesCategory) document.getElementById('imposter-sees-category').value = settings.imposterSeesCategory;
+                if(settings.gameDuration) document.getElementById('online-timer-select').value = settings.gameDuration;
             }
         });
 
@@ -929,6 +923,7 @@
         const difficulty = document.getElementById('difficulty-select').value;
         const imposterSetting = document.getElementById('imposter-count').value;
         const seesCategory = document.getElementById('imposter-sees-category').value === 'yes';
+        const gameDuration = parseInt(document.getElementById('online-timer-select').value);
 
         // Validación 3 impostores (mínimo 4 jugadores)
         if (imposterSetting === "3" && playersInRoom.length < 4) return alert("Para 3 impostores se necesitan al menos 4 jugadores.");
@@ -940,7 +935,7 @@
             let newUsedWords = selection.reset ? [secretItem.word] : [...usedWords, secretItem.word];
             
             db.ref('rooms/' + roomId + '/usedWords').set(newUsedWords);
-            startSharedGameLogic(playersInRoom, imposterSetting, categoryKey, difficulty, secretItem, seesCategory);
+            startSharedGameLogic(playersInRoom, imposterSetting, categoryKey, difficulty, secretItem, seesCategory, gameDuration);
         });
     }
 
@@ -952,6 +947,7 @@
         const difficulty = document.getElementById('offline-difficulty-select').value;
         const imposterSetting = document.getElementById('offline-imposter-count').value;
         const seesCategory = document.getElementById('offline-imposter-sees-category').value === 'yes';
+        const gameDuration = parseInt(document.getElementById('offline-timer-select').value);
 
         if (imposterSetting !== 'random' && offlinePlayers.length <= parseInt(imposterSetting)) return alert("Demasiados impostores.");
         
@@ -965,7 +961,7 @@
         else offlineUsedWords.push(secretItem.word);
 
         const setup = calculateGameSetup(offlinePlayers, imposterSetting, categoryKey, difficulty, secretItem);
-        currentGameState = { ...setup, imposterSeesCategory: seesCategory };
+        currentGameState = { ...setup, imposterSeesCategory: seesCategory, gameDuration: gameDuration };
         currentOfflineIndex = 0;
         showOfflinePassScreen();
     }
@@ -1024,7 +1020,7 @@
         };
     }
 
-    function startSharedGameLogic(players, imposterSetting, catKey, diff, secretItem, seesCategory) {
+    function startSharedGameLogic(players, imposterSetting, catKey, diff, secretItem, seesCategory, gameDuration) {
         const setup = calculateGameSetup(players, imposterSetting, catKey, diff, secretItem);
         db.ref('rooms/' + roomId + '/gameState').set({
             phase: 'assigned',
@@ -1034,6 +1030,7 @@
             secretWord: setup.secretWord,
             starterName: setup.starterName,
             imposterSeesCategory: seesCategory,
+            gameDuration: gameDuration,
             votes: {} 
         });
     }
@@ -1046,11 +1043,14 @@
             document.getElementById('btn-review-role').style.display = 'block';
             document.getElementById('host-game-controls').style.display = 'none';
             if(isHost) {
-                 const now = Date.now();
-                 const duration = 180 * 1000; 
-                 db.ref('rooms/' + roomId + '/gameState').update({
-                    phase: 'playing', startTime: now, endTime: now + duration
-                });
+                 // Si es Host, usamos la duración guardada en gameState
+                 if(currentGameState && currentGameState.gameDuration) {
+                     const duration = currentGameState.gameDuration * 1000;
+                     const now = Date.now();
+                     db.ref('rooms/' + roomId + '/gameState').update({
+                        phase: 'playing', startTime: now, endTime: now + duration
+                    });
+                 }
             }
         } else {
             nextOfflinePlayer();
@@ -1099,6 +1099,8 @@
             document.getElementById('offline-game-controls').style.display = 'block';
             document.getElementById('btn-review-role').style.display = 'none';
         }
+        
+        if (navigator.vibrate) navigator.vibrate(200); // Vibrar al inicio
 
         if(timerInterval) clearInterval(timerInterval);
         
@@ -1108,6 +1110,14 @@
             const m = Math.floor(left / 60).toString().padStart(2,'0');
             const s = (left % 60).toString().padStart(2,'0');
             document.getElementById('timer').innerText = `${m}:${s}`;
+            
+            // Efectos de sonido últimos segundos
+            if (left <= 3 && left > 0) playBeep(440, 200);
+            if (left === 0) {
+                 playBeep(880, 600);
+                 if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            }
+
             if (left <= 0) {
                 clearInterval(timerInterval);
                 document.getElementById('timer').innerText = "00:00";
@@ -1234,6 +1244,7 @@
         const p = offlinePlayers[currentOfflineIndex];
         document.getElementById('offline-current-player-display').innerText = p.name;
         document.getElementById('offline-current-player-text').innerText = p.name;
+        if (navigator.vibrate) navigator.vibrate(100);
     }
 
     function showOfflineRole() {
@@ -1252,13 +1263,17 @@
         if (currentOfflineIndex < offlinePlayers.length) {
             showOfflinePassScreen();
         } else {
-            startLocalTimer(Date.now() + 180 * 1000, currentGameState.starterName);
+            // Usar la duración guardada en local (Offline)
+            const duration = (currentGameState.gameDuration || 180) * 1000;
+            startLocalTimer(Date.now() + duration, currentGameState.starterName);
+            if (navigator.vibrate) navigator.vibrate(200); // Vibrar al empezar
         }
     }
 
     function distributeOfflinePoints(winnerType) {
         offlinePlayers.forEach(p => {
             const role = currentGameState.roles[p.id];
+            if (!role) return;
             if (winnerType === 'civilians' && !role.isImposter) p.score += 1;
             if (winnerType === 'impostors' && role.isImposter) p.score += 3;
         });
@@ -1298,6 +1313,7 @@
         const updates = {};
         playersInRoom.forEach(p => {
             const role = currentGameState.roles[p.id];
+            if(!role) return; // Safety check
             let currentScore = p.score || 0;
             let pointsToAdd = 0;
             if (winnerType === 'civilians' && role && !role.isImposter) pointsToAdd = 1;
@@ -1308,6 +1324,21 @@
     }
     function returnToLobbyGlobal() { if (CURRENT_MODE === 'online') { db.ref('rooms/' + roomId + '/gameState').set({ phase: 'reset' }); } }
     function resetLocalGame() { enterLobbyUI(); mySavedRoleData = null; }
+    
+    // --- SONIDO (WEB AUDIO API) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(frequency = 440, duration = 200, type = 'sine') {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = frequency;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration/1000);
+        setTimeout(() => osc.stop(), duration);
+    }
 </script>
 </body>
 </html>
