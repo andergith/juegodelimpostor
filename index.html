@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego del Impostor - Voting Fix</title>
+    <title>Juego del Impostor - Voting Fixed</title>
     
     <!-- --- 🔴 SECCIÓN DE LOGO E IMAGEN COMPARTIDA --- -->
     <link rel="icon" type="image/png" href="logo.png">
@@ -140,7 +140,7 @@
         button.reset-score-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--text-secondary); font-size: 0.7rem; padding: 5px; margin-top: 10px; width: auto; }
 
         .vote-btn { background-color: var(--input-bg); border: 1px solid var(--glass-border); text-align: left; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
-        .vote-btn.selected { background-color: var(--accent-color); border-color: var(--accent-color); }
+        .vote-btn.selected { background-color: var(--accent-color); border-color: var(--accent-color); opacity: 1 !important; transform: scale(1.02); }
         .vote-btn.disabled { opacity: 0.5; pointer-events: none; }
 
         .mode-btn { padding: 25px; font-size: 1.3rem; margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -905,7 +905,26 @@
             } else if (state.phase === 'playing') {
                 startLocalTimer(state.endTime, state.starterName);
             } else if (state.phase === 'voting') {
-                showVotingScreen();
+                // FIXED: Check if we are already in voting screen to avoid re-render
+                if (!document.getElementById('voting-screen').classList.contains('active')) {
+                     showVotingScreen();
+                }
+                
+                // HOST: Check if voting finished (auto-resolve)
+                if (isHost && state.votes) {
+                     const totalVotes = Object.keys(state.votes).length;
+                     // Count active players (approx)
+                     if (totalVotes >= playersInRoom.length) {
+                         setTimeout(() => endGameGlobal(), 1500);
+                     }
+                }
+                
+                // CLIENT: Update vote counts text
+                const totalVotes = state.votes ? Object.keys(state.votes).length : 0;
+                document.getElementById('vote-status').innerText = hasVoted 
+                    ? `Voto enviado (${totalVotes}/${playersInRoom.length}). Esperando...`
+                    : `Toca un nombre para acusar (${totalVotes}/${playersInRoom.length}):`;
+
             } else if (state.phase === 'finished') {
                 showResults(state);
             } else if (state.phase === 'reset') {
@@ -1099,8 +1118,6 @@
             document.getElementById('offline-game-controls').style.display = 'block';
             document.getElementById('btn-review-role').style.display = 'none';
         }
-        
-        if (navigator.vibrate) navigator.vibrate(200); // Vibrar al inicio
 
         if(timerInterval) clearInterval(timerInterval);
         
@@ -1133,6 +1150,10 @@
     function showVotingScreen() {
         clearInterval(timerInterval);
         switchScreen('voting-screen');
+        
+        // --- FIX: NO REDIBUJAR SI YA VOTÉ ---
+        if(hasVoted) return; 
+        
         hasVoted = false;
         document.getElementById('vote-status').innerText = "Toca un nombre para acusar:";
         
@@ -1244,7 +1265,6 @@
         const p = offlinePlayers[currentOfflineIndex];
         document.getElementById('offline-current-player-display').innerText = p.name;
         document.getElementById('offline-current-player-text').innerText = p.name;
-        if (navigator.vibrate) navigator.vibrate(100);
     }
 
     function showOfflineRole() {
@@ -1323,7 +1343,7 @@
         db.ref('rooms/' + roomId).update(updates).then(() => { returnToLobbyGlobal(); });
     }
     function returnToLobbyGlobal() { if (CURRENT_MODE === 'online') { db.ref('rooms/' + roomId + '/gameState').set({ phase: 'reset' }); } }
-    function resetLocalGame() { enterLobbyUI(); mySavedRoleData = null; }
+    function resetLocalGame() { enterLobbyUI(); mySavedRoleData = null; hasVoted = false; }
     
     // --- SONIDO (WEB AUDIO API) ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
